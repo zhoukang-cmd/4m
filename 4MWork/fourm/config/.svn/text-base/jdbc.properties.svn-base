@@ -1,0 +1,10 @@
+fourm.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
+fourm.url=jdbc\:sqlserver\://192.168.0.200\:1433;database\=fourm
+fourm.username=sa
+fourm.password=qwer!@34
+
+
+video.driverClassName=com.mysql.jdbc.Driver
+video.url=jdbc:mysql://58.83.226.77:3306/cms
+video.username=root
+video.password=qwer\!@34

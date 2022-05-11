@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/projects/!svn/ver/1329/fourm_server/trunk/src/config/sql-mapping
+END
+server-mssql.xml
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/projects/!svn/ver/1329/fourm_server/trunk/src/config/sql-mapping/server-mssql.xml
+END
+server-oracle.xml
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/projects/!svn/ver/1329/fourm_server/trunk/src/config/sql-mapping/server-oracle.xml
+END

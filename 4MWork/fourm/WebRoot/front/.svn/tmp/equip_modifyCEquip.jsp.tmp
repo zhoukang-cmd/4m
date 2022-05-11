@@ -1,0 +1,59 @@
+<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%>
+
+<div class="zsbtj" id="modifyCE">
+  <div class="zsbtj-top">
+   <p>修改子设备</p>
+  <span onclick="closeModifyCE()"> 关闭</span>
+  </div>
+  <form action="" id="form_modify" method="post">
+  <div class="zsbtj-nr">
+   <ul>
+  <li>
+  <span>设备编号：</span>
+  <input type="text" name="ceq.cequipCode"  id="ceCode"/></li>
+  <li>
+  <span>设备名称：</span>
+  <input type="text" name="ceq.cequipName"  id="ceName">
+  </li>
+  <li>
+  <span>设备编码：</span>
+  <input type="text" name="ceq.cequipNum"  id="ceNum"></li>
+  <li>
+  <span>设备型号：</span>
+  <input type="text" name="ceq.cequipModel" id="ceModel">
+  </li>
+  <li>
+  <span>厂家信息：</span>
+  <input type="text" name="ceq.manuInfo"  id="cemanuInfo"></li>
+  <li>
+  <span>启用时间：</span>
+  <input type="text" name="ceq.startTime"  id="cesT">
+  </li>
+  <li>
+  <span>&nbsp;&nbsp;&nbsp;&nbsp;数量：</span>
+  <input type="text" name="ceq.cequipStore" id="ceStore"></li>
+  </ul>
+  </div>
+  </form>
+  <div class="zsbtj-dibu">
+  <ul>
+ <li>
+  <a href="javascript:updmceqSubmit()"><img src="${ctx}/images/sbtz-bc.jpg" width="80" height="32" onclick="updmceqSubmit()"/></a></li>
+  <li><a href="#"><img src="${ctx}/images/sbtz-cz.jpg" width="80" height="32" /></a></li>
+  </ul>
+  </div>
+  
+</div>
+<script language="javascript" type="text/javascript"
+			src="${ctx}/My97DatePicker/WdatePicker.js"></script>
+	<script type="text/javascript">
+	//提交查询
+	function updmceqSubmit(){
+	    alert("测试");
+		$("#form_modify").attr(
+				"action",
+				"${ctx}/equip/equip_modifyCEquip.html" + "?tempId="
+						+ Math.round(Math.random() * 100));
+		$("#form_modify").submit();
+	}
+</script>

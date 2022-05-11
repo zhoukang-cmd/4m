@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 设备信息 -->    
+<sqlMap namespace="equip">
+	 <resultMap id="equip" class="com.fourm.entity.Equip">
+		<result property="equipCode" column="EQUIP_CODE" />
+		<result property="equipNum" column="EQUIP_NUM" />
+		<result property="equipName" column="EQUIP_NAME" />
+		<result property="startTime" column="EQUIP_START_TIME" />
+		<result property="model" column="EQUIP_MODEL" />
+		<result property="manuInfo" column="EQUIP_MANU_INFO" />
+		
+		<result property="managesection" column="CHANGE_MANAGESECTION" />
+		<result property="usersection" column="CHANGE_USERSECTION" />
+		<result property="useaddress" column="CHANGE_USEADDRESS" />
+		<result property="officer" column="CHANGE_OFFICER" />
+		<result property="state" column="CHANGE_STATE" />
+	</resultMap>
+	<!-- 得到设备 -->
+	<select id="getEquip" parameterClass="Integer" resultMap="equip">
+		select e.EQUIP_CODE, e.EQUIP_NUM , e.EQUIP_NAME, e.EQUIP_START_TIME,e.EQUIP_MODEL,e.EQUIP_MANU_INFO ,g.CHANGE_MANAGESECTION,g.CHANGE_USERSECTION,g.CHANGE_USEADDRESS,
+			g.CHANGE_OFFICER,g.CHANGE_STATE
+			from FOURM_T_PROVINCE  p, FOURM_T_COMPANY c, FOURM_T_MINE m , FOURM_T_ROOM r , FOURM_T_EQUIP e left join FOURM_T_EQUIPCHANGE g on e.EQUIP_ID=g.EQUIP_ID
+			where p.PROV_ID = c.PROV_ID
+			and c.COMP_ID = m.COMP_ID
+			 and m.MINE_ID = r.MINE_ID 
+			 and r.ROOM_ID = e.ROOM_ID
+			 and g.CHANGE_DATE in (select max(CHANGE_DATE) from FOURM_T_EQUIPCHANGE )
+			 and e.EQUIP_ID=#equipId#
+	</select>
+	<!-- 得到设备变动-->
+	 <resultMap id="equipChange" class="com.fourm.entity.EquipChange">
+		<result property="managesection" column="CHANGE_MANAGESECTION" />
+		<result property="usersection" column="CHANGE_USERSECTION" />
+		<result property="useaddress" column="CHANGE_USEADDRESS" />
+		<result property="officer" column="CHANGE_OFFICER" />
+		<result property="state" column="CHANGE_STATE" />
+		<result property="date" column="CHANGE_DATE" />
+		<result property="reason" column="CHANGE_REASON" />
+		<result property="people" column="CHANGE_PEOPLE" />
+		<result property="equipId" column="EQUIP_ID" nullValue="0"/>
+		<result property="changeId" column="CHANGE_ID" nullValue="0"/>
+	</resultMap>
+	<select id="getEquipChange" parameterClass="Integer" resultMap="equipChange">
+		select g.CHANGE_ID,g.CHANGE_MANAGESECTION,g.CHANGE_USERSECTION,g.CHANGE_USEADDRESS,
+			g.CHANGE_OFFICER,g.CHANGE_STATE,g.CHANGE_DATE,g.CHANGE_REASON,g.CHANGE_PEOPLE,g.EQUIP_ID
+			from FOURM_T_EQUIPCHANGE g
+			where  g.EQUIP_ID=#equipId#
+	</select>
+	
+	 <resultMap id="cEquip" class="com.fourm.entity.CEquip">
+		<result property="cequipCode" column="CEQUIP_CODE" />
+		<result property="cequipNum" column="CEQUIP_NUM" />
+		<result property="cequipName" column="CEQUIP_NAME" />
+		<result property="cequipModel" column="CEQUIP_MODEL" />
+		<result property="manuInfo" column="CEQUIP_MANU_INFO" />
+		<result property="startTime" column="CEQUIP_START_TIME" />
+		<result property="cequipStore" column="CEQUIP_STORE" />
+		<result property="equipId" column="EQUIP_ID" nullValue="0"/>
+	</resultMap>
+	
+	<select id="getCEquip" parameterClass="Integer" resultMap="cEquip">
+		SELECT C.CEQUIP_CODE, C.CEQUIP_NUM, C.CEQUIP_NAME, C.CEQUIP_MODEL, C.CEQUIP_MANU_INFO, C.CEQUIP_START_TIME, C.CEQUIP_STORE, C.EQUIP_ID
+	    FROM  FOURM_T_CEQUIP C 
+	    WHERE  C.EQUIP_ID = #equipId#
+	</select>
+</sqlMap>

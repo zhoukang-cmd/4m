@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="EclipseModuleManager">
+    <libelement value="jar://$MODULE_DIR$/lib/commons-collections.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/commons-dbcp.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/commons-io.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/commons-lang.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/commons-logging.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/commons-pool.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/jcl104-over-slf4j-1.5.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/logback-classic-0.9.8.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/logback-core-0.9.8.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/quartz-all-1.6.1.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/slf4j-api-1.5.0.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/spring.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/j2ee.jar!/" />
+    <libelement value="jar://$MODULE_DIR$/lib/commons-net-3.1.jar!/" />
+    <src_description expected_position="0">
+      <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
+    </src_description>
+  </component>
+</module>

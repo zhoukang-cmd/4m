@@ -1,0 +1,13 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 设备信息 -->
+	<package name="equip" extends="fourm-default" namespace="/equip">
+        <action name="equip_*" class="com.fourm.action.equip.EquipAction" method="{1}">	
+        	<result name="goEquip">/front/equip.jsp</result>    
+        	<result name="goModifyCEquip">/front/equip_modifyCEquip.jsp</result>	
+        	<result name="goAddEquipChange">/equip/equip_addChange.jsp</result>	
+        </action>
+	</package>
+</struts>

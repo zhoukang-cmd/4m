@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+  - Application context for the remote OrderService client.
+	- Defines various OrderService proxies to be called by OrderServiceClient.
+	-->
+<beans>
+	<bean id="placeholderConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>conf/sysconfig.properties</value>
+		</property>
+	</bean>
+	
+	<!-- 要调用的工作类 --> 
+	<bean id="processTask" class="com.fourm.client.task.ProcessFileTask">
+		<property name="clientid"><value>${client.id}</value></property>
+		<property name="sourcePath"><value>${client.sourcePath}</value></property>
+		<property name="serverList"><value>${client.serverList}</value></property>	
+		<property name="suffix"><value>${client.suffix}</value></property>	
+	</bean>
+    <!-- 定义调用对象和调用对象的方法 --> 
+    <bean id="jobtask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"> 
+        <!-- 调用的类 --> 
+        <property name="targetObject"> 
+            <ref bean="processTask"/> 
+        </property> 
+        <!-- 调用类中的方法 --> 
+        <property name="targetMethod"> 
+            <value>process</value> 
+        </property> 
+        <property name="concurrent"> 
+            <value>false</value> 
+        </property> 
+    </bean> 
+    <!-- 定义触发时间 --> 
+    <bean id="doTime" class="org.springframework.scheduling.quartz.CronTriggerBean"> 
+        <property name="jobDetail"> 
+            <ref bean="jobtask"/> 
+        </property> 
+        <!-- cron表达式 --> 
+        <property name="cronExpression"> 
+            <value>${client.cron}</value> 
+        </property> 
+    </bean>
+    
+    
+    <!-- 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序  --> 
+    <bean id="startQuertz" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"> 
+        <property name="triggers"> 
+            <list>
+                <ref bean="doTime"/>
+            </list> 
+        </property> 
+    </bean> 
+</beans>
+

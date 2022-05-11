@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 历史维护 -->   
+<sqlMap namespace="repair">	
+	<resultMap id="repair" class="com.fourm.entity.Repair">
+		<result property="repairId" column="REPAIR_ID" />
+		<result property="repairStatus" column="REPAIR_STATUS" />
+		<result property="repairCreateTime" column="REPAIR_CREATE_TIME" />
+		<result property="repairTime" column="REPAIR_TIME" />
+		<result property="repairObject" column="REPAIR_OBJECT" />
+		<result property="repairContent" column="REPAIR_CONTENT" />
+		<result property="repairQues" column="REPAIR_QUES" />
+		<result property="remainQues" column="REMAIN_QUES" />
+		<result property="equipId" column="EQUIP_ID" />
+	</resultMap>
+	<select id="getRepair" parameterClass="Map" resultMap="repair">
+	select  RowNum,A.REPAIR_ID ,  REPAIR_CREATE_TIME,   REPAIR_TIME, 
+			REPAIR_STATUS ,REPAIR_OBJECT , REPAIR_CONTENT , REPAIR_QUES, REMAIN_QUES , EQUIP_ID
+		  from 
+		  (select ROW_NUMBER() OVER (ORDER BY REPAIR_TIME) AS RowNum , REPAIR_ID , REPAIR_CREATE_TIME, 
+		  	REPAIR_TIME , 
+		  	REPAIR_STATUS ,REPAIR_OBJECT , REPAIR_CONTENT , REPAIR_QUES, REMAIN_QUES , EQUIP_ID
+			from FOURM_T_REPAIR
+			where EQUIP_ID = #equipId#
+			and REPAIR_TIME >= #startTime#
+		  and REPAIR_TIME &lt;= #endTime#
+			) A		  
+		   where RowNum > #pageCtrl.currLine#
+		   and RowNum &lt;= (#pageCtrl.currLine# + #pageCtrl.pageSize#)
+	<!--
+	select  num,A.REPAIR_ID , A.CREATETIME  REPAIR_CREATE_TIME, A.TIME  REPAIR_TIME, 
+			REPAIR_STATUS ,REPAIR_OBJECT , REPAIR_CONTENT , REPAIR_QUES, REMAIN_QUES , EQUIP_ID
+		  from 
+		  (select rownum num, REPAIR_ID , TO_CHAR( REPAIR_CREATE_TIME , 'YYYY-MM-DD HH24:MI:SS') CREATETIME, 
+		  	TO_CHAR( REPAIR_TIME , 'YYYY-MM-DD HH24:MI:SS') TIME, 
+		  	REPAIR_STATUS ,REPAIR_OBJECT , REPAIR_CONTENT , REPAIR_QUES, REMAIN_QUES , EQUIP_ID
+			from FOURM_T_REPAIR
+			where EQUIP_ID = #equipId#
+			and TO_CHAR(REPAIR_TIME , 'YYYY-MM-DD HH24:MI:SS') >= #startTime#
+		  and TO_CHAR(REPAIR_TIME , 'YYYY-MM-DD HH24:MI:SS') &lt;= #endTime#
+			) A		  
+		   where num > #pageCtrl.currLine#
+		   and num &lt;= (#pageCtrl.currLine# + #pageCtrl.pageSize#)
+	--></select>	 
+	
+	<select id="getRepairCount"  parameterClass="Map"  resultClass="int">
+	select count(1) from FOURM_T_REPAIR
+		where EQUIP_ID = #equipId#
+		 and REPAIR_TIME >= #startTime#
+		  and REPAIR_TIME &lt;= #endTime#
+	<!--
+		select count(1) from FOURM_T_REPAIR
+		where EQUIP_ID = #equipId#
+		 and TO_CHAR(REPAIR_TIME , 'YYYY-MM-DD HH24:MI:SS') >= #startTime#
+		  and TO_CHAR(REPAIR_TIME , 'YYYY-MM-DD HH24:MI:SS') &lt;= #endTime#
+		
+	--></select>
+	<select id="getRepairById"  parameterClass="int"  resultMap="repair">
+	select  REPAIR_ID ,  REPAIR_CREATE_TIME,
+			  REPAIR_TIME,
+			 REPAIR_STATUS ,REPAIR_OBJECT , REPAIR_CONTENT , REPAIR_QUES, REMAIN_QUES , EQUIP_ID
+			 from FOURM_T_REPAIR
+			 where REPAIR_ID = #detailId#
+	<!--
+		select rownum num, REPAIR_ID , TO_CHAR( REPAIR_CREATE_TIME , 'YYYY-MM-DD HH24:MI:SS') REPAIR_CREATE_TIME,
+			 TO_CHAR( REPAIR_TIME , 'YYYY-MM-DD HH24:MI:SS') REPAIR_TIME,
+			 REPAIR_STATUS ,REPAIR_OBJECT , REPAIR_CONTENT , REPAIR_QUES, REMAIN_QUES , EQUIP_ID
+			 from FOURM_T_REPAIR
+			 where REPAIR_ID = #detailId#
+		
+	--></select>
+		<delete id="delRepair" parameterClass="int" >
+		delete from FOURM_T_REPAIR 
+		  where  REPAIR_ID = #id#
+	</delete>
+	<!--REPAIR_CREATE_TIME , REPAIR_TIME ,REPAIR_STATUS ,REPAIR_OBJECT , REPAIR_CONTENT , REPAIR_QUES, REMAIN_QUES , EQUIP_ID
+	private int repairId;
+	private String repairStatus;
+	private String repairCreateTime;
+	private String repairTime;
+	private String repairObject;
+	private String repairContent;
+	private String repairQues;
+	private String remainQues;
+	
+	private int equipId;
+	-->
+	<insert id="addRepair" parameterClass="com.fourm.entity.Repair" >
+	insert into FOURM_T_REPAIR (REPAIR_CREATE_TIME , REPAIR_TIME ,REPAIR_OBJECT , REPAIR_CONTENT , REPAIR_QUES, REMAIN_QUES , EQUIP_ID) 
+		values (GETDATE() ,#repairTime#, #repairObject# , #repairContent# , #repairQues# , #remainQues# , #equipId#)
+	<!--
+		insert into FOURM_T_REPAIR (REPAIR_CREATE_TIME , REPAIR_TIME ,REPAIR_OBJECT , REPAIR_CONTENT , REPAIR_QUES, REMAIN_QUES , EQUIP_ID) 
+		values (sysdate ,TO_DATE(#repairTime# , 'YYYY-MM-DD HH24:MI:SS'), #repairObject# , #repairContent# , #repairQues# , #remainQues# , #equipId#)
+	--></insert>
+	<update id="modifyRepair" parameterClass="com.fourm.entity.Repair">
+	update FOURM_T_REPAIR set 
+				REPAIR_TIME = #repairTime# ,
+				REPAIR_OBJECT =  #repairObject# ,
+				REPAIR_CONTENT = #repairContent# ,
+				REPAIR_QUES = #repairQues# ,
+				REMAIN_QUES =  #remainQues# 
+		where REPAIR_ID = #repairId#
+	<!--
+		update FOURM_T_REPAIR set 
+				REPAIR_TIME = TO_DATE(#repairTime# , 'YYYY-MM-DD HH24:MI:SS') ,
+				REPAIR_OBJECT =  #repairObject# ,
+				REPAIR_CONTENT = #repairContent# ,
+				REPAIR_QUES = #repairQues# ,
+				REMAIN_QUES =  #remainQues# 
+		where REPAIR_ID = #repairId#
+	--></update>
+</sqlMap>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 参数信息  -->    
+<sqlMap namespace="field">
+<resultMap id="field" class="com.fourm.entity.Field">
+		<result property="fieldId" column="FIELD_ID" />
+		<result property="fieldType" column="FIELD_TYPE" />
+		<result property="fieldNo" column="FIELD_NO" />
+		<result property="fieldName" column="FIELD_NAME" />
+		<result property="fieldDesc" column="FIELD_DESC" />
+		<result property="fieldLimitLow" column="FIELD_LIMIT_LOW" />
+		<result property="fieldLimitHigh" column="FIELD_LIMIT_HIGH" />
+		<result property="fieldDisplayX" column="FIELD_DISPLAY_X" />
+		<result property="fieldDisplayY" column="FIELD_DISPLAY_Y" />
+		<result property="equipId" column="EQUIP_ID" />
+		<result property="groupId" column="GROUP_ID" />
+		<result property="groupName" column="GROUP_NAME" />
+		<result property="cequipCode" column="CEQUIP_CODE" nullValue="" />
+		<result property="typeName" column="TYPE_NAME" nullValue="" />
+	</resultMap>
+	<!-- 得到数据库中表名集合 -->
+    <select id="getExistsTable" resultClass="String">
+    	select name from sysobjects where xtype='U'
+    </select>
+    <!-- 得到当前设备字段信息 -->
+    <select id="getField" parameterClass="int" resultMap="field">   
+      select FIELD_ID ,FIELD_TYPE , FIELD_NO , FIELD_NAME , FIELD_DESC , FIELD_LIMIT_LOW , FIELD_LIMIT_HIGH ,
+    		   FIELD_DISPLAY_X , FIELD_DISPLAY_Y ,f.EQUIP_ID ,f.CEQUIP_CODE,c.TYPE_NAME,g.GROUP_ID ,GROUP_NAME
+    	from FOURM_T_FIELD f , FOURM_T_GROUP g ,FOURM_T_CEQUIPTYPE c ,FOURM_T_EQUIP e
+    	where f.EQUIP_ID = #equipId#
+    	and f.GROUP_ID = g.GROUP_ID
+    	and e.EQUIP_ID=f.EQUIP_ID
+    	and e.EQUIP_CODE=c.EQUIP_CODE
+    	 and FIELD_TYPE = 'L'
+    </select>
+	
+	<resultMap class="java.util.HashMap" id="value">
+		<result property="REAL_TIME" column="REAL_TIME" /> 
+		<result property="VALUE" column="VALUE" />														       
+	</resultMap>
+	<!-- 得到时间段内的第一个值 -->
+	<select id="getValue" parameterClass="java.util.HashMap" resultMap="value">
+		select top 1 REAL_TIME,$COLUMN$ as VALUE  from $TABLENAME$ 
+		where real_time >= #start#
+		and real_time &lt;= #end#
+		order by REAL_TIME DESC
+	</select>
+	<!-- 得到参数的FIElD_NUM -->
+	<select id="getFieldNum" parameterClass="java.util.HashMap" resultClass="java.lang.String">
+   SELECT FIELD_NO
+       FROM FOURM_T_FIELD
+      where  EQUIP_ID=#equipID#
+       and FIELD_DESC=#fieldDec#
+	</select>
+	
+	
+	 <!-- 前台     实时数据    得到最新数据 -->
+    <select id="getDisplayValue" parameterClass="java.util.HashMap" resultClass="String">
+    	select top 1 $COLUMN$  as VALUE
+   		  from $TABLE$
+   		 order by REAL_TIME DESC
+    </select> 
+    <!-- 实时数据 得到最新数据的时间 -->
+    <select id="getDisplayTime" parameterClass="java.util.HashMap" resultClass="String">
+    	select top 1 REAL_TIME from $TABLE$
+   		order by REAL_TIME DESC
+    </select> 
+    <!-- 得到图片上的字段信息 -->
+    <select id="getDisplayField" parameterClass="int" resultMap="field">
+    
+        select FIELD_ID ,FIELD_TYPE , FIELD_NO , FIELD_NAME , FIELD_DESC , FIELD_LIMIT_LOW , FIELD_LIMIT_HIGH ,
+    		   FIELD_DISPLAY_X , FIELD_DISPLAY_Y ,f.EQUIP_ID ,f.CEQUIP_CODE,c.TYPE_NAME,g.GROUP_ID ,GROUP_NAME
+    	from  FOURM_T_GROUP g ,FOURM_T_FIELD f left join  FOURM_T_CEQUIPTYPE c on c.CEQUIP_CODE=f.CEQUIP_CODE and C.EQUIP_CODE in( select EQUIP_CODE from FOURM_T_EQUIP where EQUIP_ID=f.EQUIP_ID ) 
+    	where f.EQUIP_ID = #equipId#
+    	and f.GROUP_ID = g.GROUP_ID
+    	
+ 
+		and FIELD_DISPLAY_X is not null
+		and FIELD_DISPLAY_Y is not null
+    
+	</select>
+	<!-- 得到分组参数 -->
+	<select id="getGroupField" parameterClass="int" resultMap="field">
+   select FIELD_ID ,FIELD_TYPE , FIELD_NO , FIELD_NAME , FIELD_DESC , FIELD_LIMIT_LOW , FIELD_LIMIT_HIGH ,
+    		   FIELD_DISPLAY_X , FIELD_DISPLAY_Y ,f.EQUIP_ID ,f.CEQUIP_CODE,c.TYPE_NAME,g.GROUP_ID ,GROUP_NAME
+    	from  FOURM_T_GROUP g ,FOURM_T_FIELD f left join  FOURM_T_CEQUIPTYPE c on c.CEQUIP_CODE=f.CEQUIP_CODE and C.EQUIP_CODE in( select EQUIP_CODE from FOURM_T_EQUIP where EQUIP_ID=f.EQUIP_ID ) 
+    	where f.EQUIP_ID = #equipId#
+    	and f.GROUP_ID = g.GROUP_ID
+    	 and FIELD_TYPE = 'L'
+	</select>
+</sqlMap>

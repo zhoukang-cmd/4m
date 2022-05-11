@@ -1,0 +1,16 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 工况对比 -->
+	<package name="compare" extends="fourm-default" namespace="/compare">
+		<!-- 同一设备 -->
+        <action name="compareone_*" class="com.fourm.action.compare.CompareOneAction" method="{1}">	
+        	<result name="goCompareone">/front/compare_one.jsp</result>       
+	    </action>
+	    <!-- 不同设备 -->
+        <action name="comparetwo_*" class="com.fourm.action.compare.CompareTwoAction" method="{1}">	
+        	<result name="goComparetwo">/front/compare_two.jsp</result>       
+	    </action>
+	</package>
+</struts>

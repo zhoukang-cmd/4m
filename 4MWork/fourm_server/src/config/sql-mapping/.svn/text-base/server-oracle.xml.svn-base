@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+    PUBLIC "-//iBATIS.com//DTD SQL Map 2.0//EN"
+    "http://www.ibatis.com/dtd/sql-map-2.dtd">
+
+<sqlMap namespace="server">
+
+	<!-- 插入和更新字段表 -->
+	<insert id="insertField" parameterClass="java.util.HashMap">
+	INSERT INTO FOURM_T_FIELD (FIELD_TYPE, FIELD_NO, FIELD_NAME, FIELD_DESC, EQUIP_ID)
+    VALUES (#FIELD_TYPE#, #FIELD_NO#, #FIELD_NAME#, #FIELD_DESC#, #EQUIP_ID#)
+	</insert>
+	<update id="updateField" parameterClass="java.util.HashMap" >
+	update  FOURM_T_FIELD
+	set FIELD_NAME=#FIELD_NAME#, FIELD_DESC=#FIELD_DESC#
+ 	WHERE EQUIP_ID=#EQUIP_ID# and FIELD_TYPE=#FIELD_TYPE# and FIELD_NO=#FIELD_NO#
+	</update>
+	
+	<!-- 查询煤矿、机房、设备列表 -->
+	<resultMap class="java.util.HashMap" id="MineResult">
+		<result property="MINE_ID" column="MINE_ID" />
+		<result property="SHOW" column="SHOW" />
+	</resultMap>
+	<select id="selectMine" parameterClass="java.util.HashMap" resultMap="MineResult">
+		<![CDATA[
+		select MINE_ID, MINE_CODE || '  ' || MINE_NAME AS SHOW from FOURM_T_MINE
+		]]>
+	</select>
+	<resultMap class="java.util.HashMap" id="RoomResult">
+		<result property="ROOM_ID" column="ROOM_ID" />
+		<result property="MINE_ID" column="MINE_ID" />
+		<result property="SHOW" column="SHOW" />
+	</resultMap>
+	<select id="selectRoom" parameterClass="java.util.HashMap" resultMap="RoomResult">
+		<![CDATA[
+		select ROOM_ID, MINE_ID ,ROOM_CODE || '  ' || ROOM_NAME AS SHOW from FOURM_T_ROOM
+		]]>
+	</select>
+	<resultMap class="java.util.HashMap" id="EquipResult">
+		<result property="EQUIP_ID" column="EQUIP_ID" />
+		<result property="ROOM_ID" column="ROOM_ID" />
+		<result property="SHOW" column="SHOW" />
+	</resultMap>
+	<select id="selectEquip" parameterClass="java.util.HashMap" resultMap="EquipResult">
+		<![CDATA[
+		select EQUIP_ID ,ROOM_ID, EQUIP_CODE || '  ' || EQUIP_NUM || '  ' || EQUIP_NAME AS SHOW from FOURM_T_EQUIP
+		]]>
+	</select>
+	
+	
+	<!-- select id="selectEquipId" parameterClass="java.util.HashMap" resultClass="int">
+		SELECT EQUIPID FROM FOURM_T_EQUIP A,FOURM_T_ORE B,FOURM_T_ROOM C
+    WHERE B.ORGNAME=#ORGNAME# AND B.PROVINCENAME=#PROVINCENAME# AND B.ORENAME=#ORENAME# AND C.ROOMNAME=#ROOMNAME#
+    AND C.OREID = B.OREID AND A.ROOMID=C.ROOMID AND A.EQUIPCODE=#EQUIP_CODE# AND A.EQUIPNAME=#EQUIPNAME#
+	</select -->
+	
+	<!-- 统计设备字段数 -->
+	<select id="counttables" parameterClass="java.util.HashMap" resultClass="int">
+		select count(f.FIELD_ID)
+		from FOURM_T_MINE m, FOURM_T_ROOM r, FOURM_T_EQUIP e, FOURM_T_FIELD f
+		where m.MINE_ID=r.MINE_ID and r.ROOM_ID=e.ROOM_ID and e.EQUIP_ID=f.EQUIP_ID
+		and m.MINE_CODE=#ORECODE# and r.ROOM_CODE=#ROOMCODE# and e.EQUIP_CODE=#EQUIPCODE# and e.EQUIP_NUM=#EQUIPNUM# and f.FIELD_TYPE=#FIELDTYPE#
+	</select>
+	
+	<!-- 建高频历史数据表 -->
+	<update id="createHTable" parameterClass="java.util.HashMap">
+	   CREATE TABLE $TABLENAME$ (
+	    REAL_TIME    date          NOT NULL,
+	    MILSEC       number(6, 0)     NOT NULL,
+	    <iterate property="colList" conjunction=" ">$colList[]$  number(18, 6)  NULL,</iterate>
+	    QFLAG		 char(1) NULL,
+	    BAT_ID       number(38,0)       NOT NULL,
+	    CONSTRAINT PK_$TABLENAME$ PRIMARY KEY (REAL_TIME, MILSEC))
+	    partition by range(REAL_TIME)
+	    (
+	    	partition $TABLENAME$_1301 values less than(to_date('20130101','yyyymmdd')) tablespace FOURM_20130101,
+			partition $TABLENAME$_1304 values less than(to_date('20130401','yyyymmdd')) tablespace FOURM_20130401,
+			partition $TABLENAME$_1307 values less than(to_date('20130701','yyyymmdd')) tablespace FOURM_20130701,
+			partition $TABLENAME$_1310 values less than(to_date('20131001','yyyymmdd')) tablespace FOURM_20131001,
+			partition $TABLENAME$_1401 values less than(to_date('20140101','yyyymmdd')) tablespace FOURM_20140101,
+			partition $TABLENAME$_1404 values less than(to_date('20140401','yyyymmdd')) tablespace FOURM_20140401,
+			partition $TABLENAME$_1407 values less than(to_date('20140701','yyyymmdd')) tablespace FOURM_20140701,
+			partition $TABLENAME$_1410 values less than(to_date('20141001','yyyymmdd')) tablespace FOURM_20141001,
+			partition $TABLENAME$_1501 values less than(to_date('20150101','yyyymmdd')) tablespace FOURM_20150101,
+			partition $TABLENAME$_1504 values less than(to_date('20150401','yyyymmdd')) tablespace FOURM_20150401,
+			partition $TABLENAME$_1507 values less than(to_date('20150701','yyyymmdd')) tablespace FOURM_20150701,
+			partition $TABLENAME$_1510 values less than(to_date('20151001','yyyymmdd')) tablespace FOURM_20151001,
+			partition $TABLENAME$_1601 values less than(to_date('20160101','yyyymmdd')) tablespace FOURM_20160101,
+			partition $TABLENAME$_2001 values less than(to_date('20200101','yyyymmdd')) tablespace FOURM
+			<!-- 为避免partition标识符超过30长度限制,将其日期改为YYMM格式 -->
+	    )
+	</update>
+	
+	<!-- 建低频历史数据表 -->
+	<update id="createLTable" parameterClass="java.util.HashMap">
+		CREATE TABLE $TABLENAME$(
+	    REAL_TIME    date          NOT NULL,
+	    <iterate property="colList" conjunction=" ">$colList[]$  number(18, 6)  NULL,</iterate>
+	    QFLAG		 char(1) NULL,
+	    BAT_ID       number(38,0)       NOT NULL,
+	    CONSTRAINT PK_$TABLENAME$ PRIMARY KEY (REAL_TIME))
+	     partition by range(REAL_TIME)
+	    (
+	    	partition $TABLENAME$_1301 values less than(to_date('20130101','yyyymmdd')) tablespace FOURM_20130101,
+			partition $TABLENAME$_1304 values less than(to_date('20130401','yyyymmdd')) tablespace FOURM_20130401,
+			partition $TABLENAME$_1307 values less than(to_date('20130701','yyyymmdd')) tablespace FOURM_20130701,
+			partition $TABLENAME$_1310 values less than(to_date('20131001','yyyymmdd')) tablespace FOURM_20131001,
+			partition $TABLENAME$_1401 values less than(to_date('20140101','yyyymmdd')) tablespace FOURM_20140101,
+			partition $TABLENAME$_1404 values less than(to_date('20140401','yyyymmdd')) tablespace FOURM_20140401,
+			partition $TABLENAME$_1407 values less than(to_date('20140701','yyyymmdd')) tablespace FOURM_20140701,
+			partition $TABLENAME$_1410 values less than(to_date('20141001','yyyymmdd')) tablespace FOURM_20141001,
+			partition $TABLENAME$_1501 values less than(to_date('20150101','yyyymmdd')) tablespace FOURM_20150101,
+			partition $TABLENAME$_1504 values less than(to_date('20150401','yyyymmdd')) tablespace FOURM_20150401,
+			partition $TABLENAME$_1507 values less than(to_date('20150701','yyyymmdd')) tablespace FOURM_20150701,
+			partition $TABLENAME$_1510 values less than(to_date('20151001','yyyymmdd')) tablespace FOURM_20151001,
+			partition $TABLENAME$_1601 values less than(to_date('20160101','yyyymmdd')) tablespace FOURM_20160101,
+			partition $TABLENAME$_2001 values less than(to_date('20200101','yyyymmdd')) tablespace FOURM
+			<!-- 为避免partition标识符超过30长度限制,将其日期改为YYMM格式 -->
+	    )	
+	</update>
+	
+	<!-- 插入、更新高频或低频数据表 -->
+	<insert id="insertHTables" parameterClass="java.util.HashMap">
+		INSERT INTO $TABLENAME$ (REAL_TIME, MILSEC, <iterate property="colList" conjunction=",">$colList[]$</iterate>, QFLAG, BAT_ID)
+		VALUES(#REAL_TIME#, #MILSEC#, <iterate property="valList" conjunction=",">#valList[]#</iterate>, #QFLAG#, #BAT_ID#)
+	</insert> 
+	<update id="updateHTables" parameterClass="java.util.HashMap">
+		UPDATE $TABLENAME$
+		SET $COLUMN$=#VALUE#,BAT_ID=#BAT_ID#,QFLAG=#QFLAG#
+		WHERE REAL_TIME=#REAL_TIME# AND MILSEC=#MILSEC#
+	</update>
+	<insert id="insertLTables" parameterClass="java.util.HashMap">
+		INSERT INTO $TABLENAME$ (REAL_TIME, <iterate property="colList" conjunction=",">$colList[]$</iterate>, QFLAG, BAT_ID)
+		VALUES(#REAL_TIME#, <iterate property="valList" conjunction=",">#valList[]#</iterate>, #QFLAG#, #BAT_ID#)
+	</insert>
+	<update id="updateLTables" parameterClass="java.util.HashMap">
+		UPDATE $TABLENAME$ 
+		SET $COLUMN$=#VALUE#,BAT_ID=#BAT_ID#,QFLAG=#QFLAG#
+		WHERE REAL_TIME=#REAL_TIME#
+	</update>
+	
+	<!-- 插入、查询、更新BAT表 -->
+	<insert id="insertBAT" parameterClass="java.util.HashMap">
+		INSERT INTO FOURM_T_BAT(BAT_ID,PAKNAME,STATUS,BAT_INFO,STARTTIME_UP,ENDTIME_UP,ZIP_PATH,CHANNEL)
+		VALUES(IDSEQ.NEXTVAL,#PAKNAME#,#STATUS#,#BAT_INFO#,#STARTTIME_UP#,#ENDTIME_UP#,#ZIP_PATH#,#CHANNEL#)
+	</insert>
+	<resultMap class="java.util.HashMap" id="BATResult">
+		<result property="BAT_ID" column="BAT_ID" />
+		<result property="PAKNAME" column="PAKNAME" />
+		<result property="ZIP_PATH" column="ZIP_PATH" />
+	</resultMap>
+	<select id="selectBAT" parameterClass="String" resultMap="BATResult">
+		SELECT BAT_ID,ZIP_PATH,PAKNAME FROM FOURM_T_BAT WHERE STATUS='0'
+	</select>
+	<select id="queryBATExist" parameterClass="String" resultClass="int">
+		select 1 from fourm_t_bat where PAKNAME=#PAKNAME#
+	</select>
+	<update id="updateBAT" parameterClass="java.util.HashMap">
+		UPDATE FOURM_T_BAT  
+		SET STATUS=#STATUS#,
+		BAT_INFO=#BAT_INFO#,
+		STARTTIME_RESOLVE=#STARTTIME_RESOVE#,
+		ENDTIME_RESOLVE=#ENDTIME_RESOLVE#
+		<dynamic>
+			<isNotEmpty property="ERRCODE" prepend="," >ERRCODE=#ERRCODE#</isNotEmpty>
+			<isNotEmpty property="STARTTIME_UP" prepend="," >STARTTIME_UP=#STARTTIME_UP#</isNotEmpty>
+			<isNotEmpty property="ENDTIME_UP" prepend="," >ENDTIME_UP=#ENDTIME_UP#</isNotEmpty>
+			<isNotEmpty property="ZIP_PATH" prepend="," >ZIP_PATH=#ZIP_PATH#</isNotEmpty>
+			<isNotEmpty property="CHANNEL" prepend="," >CHANNEL=#CHANNEL#</isNotEmpty>
+		</dynamic>
+		WHERE BAT_ID = #BAT_ID#
+	</update>
+	
+	<!-- insert id="insertFOURM_T_VIBRA" parameterClass="java.util.HashMap">
+		INSERT INTO FOURM_T_VIBRA(REAL_TIME,EQUIPID,VALUE0,VALUE1,VALUE2,VALUE3,VALUE4,VALUE5,VALUE6,VALUE7)
+		VALUES(#REAL_TIME#,#EQUIPID#,#VALUE0#,#VALUE1#,#VALUE2#,#VALUE3#,#VALUE4#,#VALUE5#,#VALUE6#,#VALUE7#)
+	</insert>
+	<insert id="insertFOURM_T_DETAIL" parameterClass="java.util.HashMap">
+	INSERT INTO FOURM_T_DETAIL (NOWTIME,EQUIPID,FJFY,ZS,FJZCX1ZCWD,FJZCX2ZCWD,FJZCX3ZCWD,FJZCX4ZCWD,DJQZCWD,DJHZCWD,XYZJKYW,XYZCKYW,XYZJKYY,XYZCKYY,XYZYW,DJUXDL,DJVXDL,DJWXDL,DJUXDY,DJVXDY,DJWXDY,DJUXWD,DJVXWD,DJWXWD,DJQZCXZD,DJQZCYZD,DJHZCXZD,DJHZCYZD,ZCXQXZD,ZCXQYZD,ZCXHXZD,ZCXHYZD)
+	VALUES(#NOWTIME#,#EQUIPID#,#FJFY#,#ZS#,#FJZCX1ZCWD#,#FJZCX2ZCWD#,#FJZCX3ZCWD#,#FJZCX4ZCWD#,#DJQZCWD#,#DJHZCWD#,#XYZJKYW#,#XYZCKYW#,#XYZJKYY#,#XYZCKYY#,#XYZYW#,#DJUXDL#,#DJVXDL#,#DJWXDL#,#DJUXDY#,#DJVXDY#,#DJWXDY#,#DJUXWD#,#DJVXWD#,#DJWXWD#,#DJQZCXZD#,#DJQZCYZD#,#DJHZCXZD#,#DJHZCYZD#,#ZCXQXZD#,#ZCXQYZD#,#ZCXHXZD#,#ZCXHYZD#)
+	</insert -->
+	
+	<!-- 查询高频、低频历史数据表最新一条数据 -->
+	<resultMap class="java.util.HashMap" id="NewHValuesResult">
+		<result property="REAL_TIME" column="REAL_TIME" /> 
+		<result property="VALUE" column="VALUE" />														       
+		<result property="MILSEC" column="MILSEC" />														       
+		<result property="BAT_ID" column="BAT_ID" />														       
+	</resultMap>
+	<select id="selectNewHValues" parameterClass="java.util.HashMap" resultMap="NewHValuesResult">
+	select REAL_TIME, $COLUMN$ as VALUE, MILSEC, BAT_ID from $TABLENAME$
+	WHERE REAL_TIME=(SELECT MAX(REAL_TIME) FROM $TABLENAME$)
+	AND MILSEC=(SELECT MAX(MILSEC) FROM $TABLENAME$ WHERE REAL_TIME=(SELECT MAX(REAL_TIME) FROM $TABLENAME$))
+	</select>
+	<resultMap class="java.util.HashMap" id="NewLValuesResult">
+		<result property="REAL_TIME" column="REAL_TIME" /> 
+		<result property="VALUE" column="VALUE" />														       
+		<result property="BAT_ID" column="BAT_ID" />														       
+	</resultMap>
+	<select id="selectNewLValues" parameterClass="java.util.HashMap" resultMap="NewLValuesResult">
+		select REAL_TIME,$COLUMN$ as VALUE,BAT_ID from $TABLENAME$ where real_time=(select max(real_time) from $TABLENAME$)
+	</select>
+	
+	<!-- resultMap class="java.util.HashMap" id="realvalueMap">
+		<result property="ORECODE" column="ORECODE" /> 
+		<result property="ROOMCODE" column="ROOMCODE" />														       
+		<result property="EQUIPCODE" column="EQUIPCODE" />														       
+		<result property="EQUIPNUM" column="EQUIPNUM" />														       
+		<result property="ORDERNO" column="ORDERNO" />														       
+		<result property="FIELDTYPE" column="FIELDTYPE" />														       
+		<result property="MILSEC" column="MILSEC" />														       
+		<result property="REAL_TIME" column="REAL_TIME" />														       
+		<result property="VALUE" column="VALUE" />														       
+		<result property="EQUIPNUM" column="EQUIPNUM" />														       
+	</resultMap -->
+	
+</sqlMap>

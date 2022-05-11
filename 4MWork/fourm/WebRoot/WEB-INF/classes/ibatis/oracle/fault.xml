@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 历史故障 -->    
+<sqlMap namespace="fault">
+	<resultMap id="fault" class="com.fourm.entity.Fault">
+		<result property="faultId" column="FAULT_ID" />
+		<result property="faultCreateTime" column="FAULT_CREATE_TIME" />
+		<result property="faultTime" column="FAULT_TIME" />
+		<result property="faultPosition" column="FAULT_POSITION" />
+		<result property="faultLevel" column="FAULT_LEVEL" />
+		<result property="faultTrend" column="FAULT_TREND" />
+		<result property="equipId" column="EQUIP_ID" />
+		<result property="faultField" column="FAULT_FIELD"/>
+	</resultMap>
+	<select id="getFault" parameterClass="Map" resultMap="fault">
+	select  RowNum,A.FAULT_ID ,A.CREATETIME  FAULT_CREATE_TIME, A.TIME  FAULT_TIME,  FAULT_POSITION ,FAULT_LEVEL ,FAULT_TREND ,  EQUIP_ID, FAULT_FIELD
+		  from 
+		  ( select ROW_NUMBER() OVER (ORDER BY FAULT_TIME) AS RowNum , FAULT_ID , FAULT_CREATE_TIME CREATETIME, FAULT_TIME TIME, FAULT_POSITION ,FAULT_LEVEL ,FAULT_TREND ,  EQUIP_ID , FAULT_FIELD
+			from FOURM_T_FAULT
+			where EQUIP_ID = #equipId#
+			<dynamic prepend="">
+			<isNotEmpty prepend=" AND " property="startTime">
+			 FAULT_TIME >= #startTime#
+			</isNotEmpty>
+			<isNotEmpty prepend=" AND " property="endTime">
+		     FAULT_TIME &lt;= #endTime#
+		    </isNotEmpty>
+		  </dynamic>
+			) A		  
+		   where RowNum > #pageCtrl.currLine#
+		   and RowNum &lt;= (#pageCtrl.currLine# + #pageCtrl.pageSize#)
+	<!--
+	select  num,A.FAULT_ID ,A.CREATETIME  FAULT_CREATE_TIME, A.TIME  FAULT_TIME,  FAULT_POSITION ,FAULT_LEVEL ,FAULT_TREND ,  EQUIP_ID
+		  from 
+		  (select rownum num, FAULT_ID , TO_CHAR( FAULT_CREATE_TIME , 'YYYY-MM-DD HH24:MI:SS') CREATETIME, TO_CHAR( FAULT_TIME , 'YYYY-MM-DD HH24:MI:SS') TIME, FAULT_POSITION ,FAULT_LEVEL ,FAULT_TREND ,  EQUIP_ID
+			from FOURM_T_FAULT
+			where EQUIP_ID = #equipId#
+			and TO_CHAR(FAULT_TIME , 'YYYY-MM-DD HH24:MI:SS') >= #startTime#
+		  and TO_CHAR(FAULT_TIME , 'YYYY-MM-DD HH24:MI:SS') &lt;= #endTime#
+			) A		  
+		   where num > #pageCtrl.currLine#
+		   and num &lt;= (#pageCtrl.currLine# + #pageCtrl.pageSize#)
+	--></select>	 
+	
+	<select id="getFaultCount"  parameterClass="Map"  resultClass="int">
+		select count(1) from FOURM_T_FAULT
+		where EQUIP_ID = #equipId#
+		 and FAULT_TIME >= #startTime#
+		  and FAULT_TIME &lt;= #endTime#
+		
+	</select>
+	<select id="getFaultById"  parameterClass="int"  resultMap="fault">
+	select  FAULT_ID , FAULT_CREATE_TIME , FAULT_TIME, FAULT_POSITION ,FAULT_LEVEL ,FAULT_TREND , FAULT_FIELD, EQUIP_ID
+			from FOURM_T_FAULT
+			where FAULT_ID = #detailId#
+	<!--
+		select rownum num, FAULT_ID , TO_CHAR( FAULT_CREATE_TIME , 'YYYY-MM-DD HH24:MI:SS') FAULT_CREATE_TIME, TO_CHAR( FAULT_TIME , 'YYYY-MM-DD HH24:MI:SS') FAULT_TIME, FAULT_POSITION ,FAULT_LEVEL ,FAULT_TREND ,  EQUIP_ID
+			from FOURM_T_FAULT
+			where FAULT_ID = #detailId#
+	--></select>
+		<delete id="delFault" parameterClass="int" >
+		delete from FOURM_T_FAULT
+		  where FAULT_ID = #id#
+	</delete>
+	<insert id="addFault" parameterClass="com.fourm.entity.Fault" >
+	insert into FOURM_T_FAULT (FAULT_CREATE_TIME , FAULT_TIME , FAULT_POSITION ,FAULT_LEVEL , FAULT_TREND , EQUIP_ID,FAULT_FIELD) 
+		values (GETDATE() , #faultTime#, #faultPosition# , #faultLevel# , #faultTrend# ,#equipId#,#faultField#)
+	<!--
+		insert into FOURM_T_FAULT (FAULT_CREATE_TIME , FAULT_TIME , FAULT_POSITION ,FAULT_LEVEL , FAULT_TREND , EQUIP_ID) 
+		values (sysdate , to_date(#faultTime#,'YYYY-MM-DD HH24:MI:SS'), #faultPosition# , #faultLevel# , #faultTrend# ,#equipId#)
+	--></insert>
+	<!--	FAULT_POSITION ,FAULT_LEVEL ,FAULT_TREND ,  EQUIP_ID
+private int faultId;
+	private String faultCreateTime;
+	private String faultTime;
+	private String faultPosition;
+	private String faultLevel;
+	private String faultTrend;
+	
+	private int equipId;
+-->
+	<update id="modifyFault" parameterClass="com.fourm.entity.Fault">
+	update FOURM_T_FAULT set 
+				FAULT_TIME = #faultTime# ,
+				FAULT_POSITION =  #faultPosition# ,
+				FAULT_LEVEL = #faultLevel# ,
+				FAULT_TREND = #faultTrend# ,
+				 FAULT_FIELD=#faultField#
+		where FAULT_ID = #faultId#
+	<!--
+		update FOURM_T_FAULT set 
+				FAULT_TIME = TO_DATE(#faultTime# , 'YYYY-MM-DD HH24:MI:SS') ,
+				FAULT_POSITION =  #faultPosition# ,
+				FAULT_LEVEL = #faultLevel# ,
+				FAULT_TREND = #faultTrend# 
+		where FAULT_ID = #faultId#
+	--></update>
+	
+	
+	<!-- 得到类型 时间 最末的 一条故障 -->
+	
+	
+		<select id="getFaultByTypeTime"  parameterClass="Map"  resultMap="fault">
+		select FAULT_ID,FAULT_CREATE_TIME,FAULT_TIME,FAULT_POSITION,FAULT_LEVEL,FAULT_TREND,FAULT_FIELD ,EQUIP_ID
+		from FOURM_T_FAULT
+		where EQUIP_ID = #equipId#
+		<dynamic prepend="">
+		  <isNotEmpty prepend="AND" property="faultField">
+		  FAULT_FIELD=#faultField#
+		  </isNotEmpty>
+		<isNotEmpty prepend="AND" property="faultPosition">
+		  FAULT_POSITION=#faultPosition#
+		  </isNotEmpty>
+		</dynamic>
+		  and FAULT_TIME in (select max(FAULT_TIME) from FOURM_T_FAULT where 
+		   EQUIP_ID = #equipId# 
+		   <dynamic prepend="">
+		  <isNotEmpty prepend="AND" property="faultField">
+		    FAULT_FIELD=#faultField# 
+		   </isNotEmpty>
+		   <isNotEmpty prepend="AND" property="faultPosition">
+		    FAULT_POSITION=#faultPosition#
+		   </isNotEmpty>
+		   </dynamic>
+		   )
+		
+	</select>
+	
+</sqlMap>

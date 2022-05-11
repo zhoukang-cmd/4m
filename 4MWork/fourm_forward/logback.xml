@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration>
+
+<configuration debug="false">
+
+	<!-- jmxConfigurator /-->
+
+	<conversionRule conversionWord="short"
+		converterClass="com.csii.pe.common.logging.ShortLoggerConverter" />
+
+	<conversionRule conversionWord="count"
+		converterClass="com.csii.pe.common.logging.CountingConverter" />
+
+	<appender name="CONSOLE"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+			%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %logger %M %m%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<File>
+			./log/fourmclient.log
+		</File>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        	<FileNamePattern>
+        	./log/fourmclient.%d{yyyy-MM-dd}.log
+        	</FileNamePattern>
+        </rollingPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>
+			%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] %logger %X{sessionId} %X{transId} %X{transName} %X{userId} %m%n
+			</Pattern>
+		</layout>
+	</appender>
+
+	<logger name="com.fourm" additivity="false">
+		<level value="debug" />
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="FILE" />
+	</logger>
+	<root>
+		<level value="info" />
+		<appender-ref ref="FILE" />
+		<appender-ref ref="CONSOLE"></appender-ref>
+	</root>
+
+</configuration>

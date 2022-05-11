@@ -1,0 +1,13 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 用户登录 -->
+	<package name="user" extends="fourm-default" namespace="/user">
+        <action name="user_*" class="com.fourm.action.user.UserAction" method="{1}">	
+        	<interceptor-ref name="defaultStack"></interceptor-ref>
+        	<result name="input">/index.jsp</result>
+        	<result name="front">/front/display.jsp</result>       
+	    </action>
+	</package>
+</struts>

@@ -1,0 +1,11 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 智能分析 -->
+	<package name="analyse" extends="fourm-default" namespace="/analyse">
+        <action name="analyse_*" class="com.fourm.action.analyse.AnalyseAction" method="{1}">	
+        	<result name="goAnalyse">/front/analyse.jsp</result>
+	    </action>
+	</package>
+</struts>

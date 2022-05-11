@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+
+<!-- 
+在Spring中，使用PropertyPlaceholderConfigurer可以在XML配置文件中加入
+外部属性文件，当然也可以指定外部文件的编码。PropertyPlaceholderConfigurer
+可以将上下文（配置文 件）中的属性值放在另一个单独的标准java Properties文件中去。
+在XML文件中用${key}替换指定的properties文件中的值。这样的话，只需要对properties
+文件进 行修改，而不用对xml配置文件进行修改
+-->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+<!-- 
+jdbc.properties文件中配置了数据库连接信息，通过${fourm.driverClassName}来访问
+-->
+	<bean id="fourm_pool" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${fourm.driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value><![CDATA[${fourm.url}]]></value>
+		</property>
+		<property name="user">
+			<value>${fourm.username}</value>
+		</property>
+		<property name="password">
+			<value>${fourm.password}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>3600</value>
+		</property>
+		<property name="preferredTestQuery">
+			<value>SELECT 1</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>1800</value>
+		</property>
+		<!--<property name="testConnectionOnCheckout">
+			<value>true</value>
+		</property>
+	--></bean>
+	
+	
+	<bean id="camera_pool" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${video.driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value><![CDATA[${video.url}]]></value>
+		</property>
+		<property name="user">
+			<value>${video.username}</value>
+		</property>
+		<property name="password">
+			<value>${video.password}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>3600</value>
+		</property>
+		<property name="preferredTestQuery">
+			<value>SELECT 1</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>1800</value>
+		</property>
+		<property name="testConnectionOnCheckout">
+			<value>true</value>
+		</property>
+	</bean>
+	
+	<bean id="playback_pool" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${video.driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value><![CDATA[${video.url}]]></value>
+		</property>
+		<property name="user">
+			<value>${video.username}</value>
+		</property>
+		<property name="password">
+			<value>${video.password}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>3600</value>
+		</property>
+		<property name="preferredTestQuery">
+			<value>SELECT 1</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>1800</value>
+		</property>
+		<property name="testConnectionOnCheckout">
+			<value>true</value>
+		</property>
+	</bean>
+	
+	
+	<!-- 为业务逻辑Bean配置事务代理
+      transactionManager 指定配置事务代理所需要注入的事务管理器
+      target用于指定为哪个Bean配置事务代理 
+      PROPAGATION_REQUIRED  支持当前事务，如果当前没有事务，就新建一个事务。这是最常见的选择。 
+      PROPAGATION_SUPPORTS  支持当前事务，如果当前没有事务，就以非事务方式执行。 
+      PROPAGATION_MANDATORY  支持当前事务，如果当前没有事务，就抛出异常。 
+	  PROPAGATION_REQUIRES_NEW  新建事务，如果当前存在事务，把当前事务挂起。 
+      PROPAGATION_NOT_SUPPORTED  以非事务方式执行操作，如果当前存在事务，就把当前事务挂起。 
+      PROPAGATION_NEVER  以非事务方式执行，如果当前存在事务，则抛出异常。 
+      PROPAGATION_NESTED  如果当前存在事务，则在嵌套事务内执行。
+      -->
+	<bean id="transactionProxy"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+		abstract="true">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+	
+<!-- **********************************************-->
+<!-- 配置JDBC数据源的局部事务管理器，使用DataSourceTransactionManager 类， 
+   该类实现PlatformTransactionManager接口，是针对采用数据源连接的特定实现，
+   配置DataSourceTransactionManager时需要依注入DataSource的引用 -->
+	<bean id="fourmTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="fourm_pool" />
+	</bean>
+	
+	<bean id="cameraTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="camera_pool" />
+	</bean>
+	
+	<bean id="playbackTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="playback_pool" />
+	</bean>
+	
+<!-- **********************************************-->
+
+<!--SqlMapClientFactoryBean的主要的几个属性：                            
+  1 configLocations                                ibatis的配置文件的地址                         
+  2 mappingLocations                            Ibatis映射文件路径                          
+  3 sqlMapClientProperties                    ibatis的sqlmapclient的属性          
+  4 dataSource                                        数据源                                              
+  5 useTransactionAwareDataSource   使用spring 的事物包装数据源       
+  6 transactionConfigClass                    事物配置类                              
+  7 transactionConfigProperties           事物配置属性                       
+  8 sqlMapClient    
+  -->
+	<bean id="fourmSqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+			<value>classpath:sqlMapConfig_fourm.xml</value>
+		</property>
+		<property name="dataSource" ref="fourm_pool" />
+	</bean>
+	  
+	<bean id="cameraSqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+			<value>classpath:sqlMapConfig_video.xml</value>
+		</property>
+		<property name="dataSource" ref="camera_pool" />
+	</bean>
+	
+	<bean id="playbackSqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+			<value>classpath:sqlMapConfig_video.xml</value>
+		</property>
+		<property name="dataSource" ref="playback_pool" />
+	</bean>
+
+
+<!-- **********************************************-->
+<!-- SqlMapClientTemplate是org.springframework.orm.ibatis下的,而SqlMapClient是ibatis的
+        SqlMapClientTemplate是SqlMapClient的封装类. 
+        SqlMapClient中包含着session的管理. 
+        SqlMapClientTemplate用于session的封装,以及异常的捕捉. 
+         所以按照以上的推断来说.应该尽量使用SqlMapClientTemplate. 
+        保证session以及Exception的正常以及统一.
+-->
+
+	<bean id="fourmSqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient" ref="fourmSqlMapClient" />
+	</bean>
+	
+	<bean id="cameraSqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient" ref="cameraSqlMapClient" />
+	</bean>
+	
+	<bean id="playbackSqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient" ref="playbackSqlMapClient" />
+	</bean>
+<!-- **********************************************-->
+
+<!-- 在如下的文件中，定义了每个数据库表对应的Dao类    -->
+	<import resource="classpath:applicationContext-dao.xml" />
+	<import resource="classpath:applicationContext-service.xml" />
+</beans>

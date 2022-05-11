@@ -1,0 +1,23 @@
+#
+#Wed Oct 24 10:15:40 CST 2012
+client.id=client1
+client.suffix=zip
+client.sourcePath=D\:/fourm_server/his
+client.serverList=local,remote
+client.cron=0/10 * * * * ? *
+
+local.ftp.serverUrl=192.168.1.201
+local.ftp.serverPort=21
+local.ftp.serverPath=data
+local.ftp.username=fourm
+local.ftp.password=fourm
+local.tcpserver.host=192.168.1.201
+local.tcpserver.port=9999
+
+remote.ftp.serverUrl=58.83.226.76
+remote.ftp.serverPort=21
+remote.ftp.serverPath=data
+remote.ftp.username=bjtest
+remote.ftp.password=bjtest
+remote.tcpserver.host=58.83.226.76
+remote.tcpserver.port=9999

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 设备信息 -->    
+<sqlMap namespace="equip">
+	 <resultMap id="equip" class="com.fourm.entity.Equip">
+		<result property="equipCode" column="EQUIP_CODE" />
+		<result property="equipNum" column="EQUIP_NUM" />
+		<result property="equipName" column="EQUIP_NAME" />
+		<result property="startTime" column="EQUIP_START_TIME" />
+		<result property="model" column="EQUIP_MODEL" />
+		<result property="manuInfo" column="EQUIP_MANU_INFO" />
+		
+		<result property="managesection" column="CHANGE_MANAGESECTION" />
+		<result property="usersection" column="CHANGE_USERSECTION" />
+		<result property="useaddress" column="CHANGE_USEADDRESS" />
+		<result property="officer" column="CHANGE_OFFICER" />
+		<result property="state" column="CHANGE_STATE" />
+	</resultMap>
+	<!-- 得到设备 -->
+	<select id="getEquip" parameterClass="Integer" resultMap="equip">
+		select e.EQUIP_CODE, e.EQUIP_NUM , e.EQUIP_NAME, CONVERT(char(10), e.EQUIP_START_TIME,120) as EQUIP_START_TIME,e.EQUIP_MODEL,e.EQUIP_MANU_INFO ,g.CHANGE_MANAGESECTION,g.CHANGE_USERSECTION,g.CHANGE_USEADDRESS,
+			g.CHANGE_OFFICER,g.CHANGE_STATE
+			from FOURM_T_PROVINCE  p, FOURM_T_COMPANY c, FOURM_T_MINE m , FOURM_T_ROOM r , FOURM_T_EQUIP e left join FOURM_T_EQUIPCHANGE g on e.EQUIP_ID=g.EQUIP_ID and g.CHANGE_DATE in (select max(CHANGE_DATE) from FOURM_T_EQUIPCHANGE  group by EQUIP_ID)
+			where p.PROV_ID = c.PROV_ID
+			and c.COMP_ID = m.COMP_ID
+			 and m.MINE_ID = r.MINE_ID 
+			 and r.ROOM_ID = e.ROOM_ID
+			 and e.EQUIP_ID=#equipId#
+	</select>
+	<!-- 得到机房所有设备 -->
+	<select id="getEquipByRoom" parameterClass="Integer" resultMap="equip">
+			select e.EQUIP_CODE, e.EQUIP_NUM , e.EQUIP_NAME, CONVERT(char(10), e.EQUIP_START_TIME,120) as EQUIP_START_TIME ,e.EQUIP_MODEL,e.EQUIP_MANU_INFO ,g.CHANGE_MANAGESECTION,g.CHANGE_USERSECTION,g.CHANGE_USEADDRESS,
+			g.CHANGE_OFFICER,g.CHANGE_STATE
+			from FOURM_T_PROVINCE  p, FOURM_T_COMPANY c, FOURM_T_MINE m , FOURM_T_ROOM r , FOURM_T_EQUIP e left join FOURM_T_EQUIPCHANGE g on e.EQUIP_ID=g.EQUIP_ID and g.CHANGE_DATE in (select max(CHANGE_DATE) from FOURM_T_EQUIPCHANGE group by EQUIP_ID)
+			where 
+		    p.PROV_ID = c.PROV_ID
+			and c.COMP_ID = m.COMP_ID
+			 and m.MINE_ID = r.MINE_ID 
+			 and r.ROOM_ID = e.ROOM_ID
+			 and e.ROOM_ID=#roomId#
+	</select>
+	
+	  <!-- 得到条件查询设备 -->
+	  <select id="selQueryEquip" parameterClass="java.util.HashMap" resultMap="equip">
+	     select e.EQUIP_CODE, e.EQUIP_NUM , e.EQUIP_NAME, CONVERT(char(10), e.EQUIP_START_TIME,120) as EQUIP_START_TIME ,e.EQUIP_MODEL,e.EQUIP_MANU_INFO ,g.CHANGE_MANAGESECTION,g.CHANGE_USERSECTION,g.CHANGE_USEADDRESS,
+			g.CHANGE_OFFICER,g.CHANGE_STATE
+			from FOURM_T_PROVINCE  p, FOURM_T_COMPANY c, FOURM_T_MINE m , FOURM_T_ROOM r , FOURM_T_EQUIP e left join FOURM_T_EQUIPCHANGE g on e.EQUIP_ID=g.EQUIP_ID and g.CHANGE_DATE in (select max(CHANGE_DATE) from FOURM_T_EQUIPCHANGE group by EQUIP_ID)
+	     where
+	         p.PROV_ID = c.PROV_ID
+			 and c.COMP_ID = m.COMP_ID
+			 and m.MINE_ID = r.MINE_ID 
+			 and r.ROOM_ID = e.ROOM_ID
+			 and e.ROOM_ID=#roomId#
+		<dynamic prepend="">
+	      <isNotEmpty prepend=" AND " property="equipName"> 
+	        e.EQUIP_NAME  like     '%$equipName$%'
+          </isNotEmpty>
+	      <isNotEmpty prepend=" AND " property="equipCode"> 
+	        e.EQUIP_CODE =#equipCode# 
+          </isNotEmpty>
+          <isNotEmpty prepend=" AND " property="equipNum"> 
+	        e.EQUIP_NUM  =#equipNum#
+          </isNotEmpty>
+         
+	  </dynamic>
+	  </select>
+	  
+	  
+	  
+	<!-- 得到设备变动-->
+ <resultMap id="equipChange" class="com.fourm.entity.EquipChange">
+		<result property="managesection" column="CHANGE_MANAGESECTION" />
+		<result property="usersection" column="CHANGE_USERSECTION" />
+		<result property="useaddress" column="CHANGE_USEADDRESS" />
+		<result property="officer" column="CHANGE_OFFICER" />
+		<result property="state" column="CHANGE_STATE" />
+		<result property="date" column="CHANGE_DATE" />
+		<result property="reason" column="CHANGE_REASON" />
+		<result property="people" column="CHANGE_PEOPLE" />
+		<result property="equipId" column="EQUIP_ID" nullValue="0"/>
+		<result property="changeId" column="CHANGE_ID" nullValue="0"/>
+	</resultMap>
+	<select id="getEquipChange" parameterClass="Integer" resultMap="equipChange">
+		select g.CHANGE_ID,g.CHANGE_MANAGESECTION,g.CHANGE_USERSECTION,g.CHANGE_USEADDRESS,
+			g.CHANGE_OFFICER,g.CHANGE_STATE,g.CHANGE_DATE,g.CHANGE_REASON,g.CHANGE_PEOPLE,g.EQUIP_ID
+			from FOURM_T_EQUIPCHANGE g
+			where  g.EQUIP_ID=#equipId#
+	</select>
+		<!-- 添加设备变动信息 -->
+	<insert id="getAddEquipChange" parameterClass="com.fourm.entity.EquipChange">
+	    insert into FOURM_T_EQUIPCHANGE(CHANGE_MANAGESECTION,CHANGE_USERSECTION,CHANGE_OFFICER,CHANGE_STATE,CHANGE_DATE,CHANGE_REASON,
+           CHANGE_USEADDRESS,EQUIP_ID) 
+            values(#managesection#,#usersection#,#officer#,#state#,#date#,#reason#,#useaddress#,#equipId#)
+	</insert>
+	
+	<!--得到子设备-->
+	 <resultMap id="cEquip" class="com.fourm.entity.CEquip">
+		<result property="cequipCode" column="CEQUIP_CODE" />
+		<result property="cequipNum" column="CEQUIP_NUM" />
+		<result property="cequipName" column="CEQUIP_NAME" />
+		<result property="cequipModel" column="CEQUIP_MODEL" />
+		<result property="manuInfo" column="CEQUIP_MANU_INFO" />
+		<result property="startTime" column="CEQUIP_START_TIME" />
+		<result property="cequipStore" column="CEQUIP_STORE" />
+		<result property="equipId" column="EQUIP_ID" nullValue="0"/>
+		<result property="cequipId" column="CEQUIP_ID" nullValue="0"/>
+	</resultMap>
+	
+	<select id="getCEquip" parameterClass="Integer" resultMap="cEquip">
+		SELECT C.CEQUIP_CODE, C.CEQUIP_NUM, C.CEQUIP_NAME, C.CEQUIP_MODEL, C.CEQUIP_MANU_INFO, CONVERT(char(10), C.CEQUIP_START_TIME, 120) as CEQUIP_START_TIME , C.CEQUIP_STORE, C.EQUIP_ID, C.CEQUIP_ID
+	    FROM  FOURM_T_CEQUIP C 
+	    WHERE  C.EQUIP_ID = #equipId#
+	</select>
+	  <select id="getCEquipId"  parameterClass="Integer" resultMap="cEquip">
+	SELECT C.CEQUIP_CODE, C.CEQUIP_NUM, C.CEQUIP_NAME, C.CEQUIP_MODEL, C.CEQUIP_MANU_INFO, C.CEQUIP_START_TIME, C.CEQUIP_STORE, C.CEQUIP_ID, C.EQUIP_ID
+	    FROM  FOURM_T_CEQUIP C
+	    WHERE  C.CEQUIP_ID = #detailId#
+    </select>
+	  <!-- 得到条件查询子设备 -->
+	  <select id="selQueryCEquip" parameterClass="java.util.HashMap" resultMap="cEquip">
+	     SELECT C.CEQUIP_CODE, C.CEQUIP_NUM, C.CEQUIP_NAME, C.CEQUIP_MODEL, C.CEQUIP_MANU_INFO, C.CEQUIP_START_TIME, C.CEQUIP_STORE, C.EQUIP_ID, C.CEQUIP_ID
+	    FROM  FOURM_T_CEQUIP C 
+	    WHERE  C.EQUIP_ID = #equipId#
+		<dynamic prepend="">
+	      <isNotEmpty prepend=" AND " property="cEquipName"> 
+	        C.CEQUIP_NAME  like     '%$cEquipName$%'
+          </isNotEmpty>
+	      <isNotEmpty prepend=" AND " property="csTime"> 
+	        C.CEQUIP_START_TIME  >=#csTime# 
+          </isNotEmpty>
+         <isNotEmpty prepend=" AND " property="ceTime">
+            C.CEQUIP_START_TIME &lt;= #ceTime#
+         </isNotEmpty>
+	  </dynamic>
+	  </select>
+	  
+	   <!-- 得到条件查询设备变动 -->
+	  <select id="selQueryChange" parameterClass="java.util.HashMap" resultMap="equipChange">
+	    select g.CHANGE_ID,g.CHANGE_MANAGESECTION,g.CHANGE_USERSECTION,g.CHANGE_USEADDRESS,
+			g.CHANGE_OFFICER,g.CHANGE_STATE,g.CHANGE_DATE,g.CHANGE_REASON,g.CHANGE_PEOPLE,g.EQUIP_ID
+			from FOURM_T_EQUIPCHANGE g
+			where  g.EQUIP_ID=#equipId#
+		<dynamic prepend="">
+	      <isNotEmpty prepend=" AND " property="state"> 
+	        g.CHANGE_STATE  like     '%$state$%'
+          </isNotEmpty>
+	      <isNotEmpty prepend=" AND " property="csTime"> 
+	       g.CHANGE_DATE  >=#csTime# 
+          </isNotEmpty>
+         <isNotEmpty prepend=" AND " property="ceTime">
+           g.CHANGE_DATE &lt;= #ceTime#
+         </isNotEmpty>
+	  </dynamic>
+	  </select>
+	  
+	<!-- 添加子设备信息 -->
+	<insert id="getAddCEquip" parameterClass="com.fourm.entity.CEquip" >
+	insert into FOURM_T_CEQUIP
+  (CEQUIP_CODE,CEQUIP_NUM,CEQUIP_NAME,CEQUIP_MODEL,CEQUIP_MANU_INFO,CEQUIP_START_TIME,CEQUIP_STORE,EQUIP_ID)
+  values(#cequipCode#,#cequipNum#,#cequipName#,#cequipModel#,#manuInfo#,#startTime#,#cequipStore#,#equipId#) 
+	</insert>
+		<!-- 修改子设备 -->
+	<update id="getModifyCEquip" parameterClass="com.fourm.entity.CEquip">
+	   update FOURM_T_CEQUIP set CEQUIP_CODE = #cequipCode#,
+                         CEQUIP_NUM = #cequipNum#,
+                         CEQUIP_NAME = #cequipName#,
+                         CEQUIP_MODEL = #cequipModel#',
+                         CEQUIP_MANU_INFO = #manuInfo#,
+                         CEQUIP_START_TIME = #startTime#,
+                         CEQUIP_STORE = #cequipStore#  
+                         where CEQUIP_ID = #cequipId#
+	</update>
+	<!--删除变动信息-->
+	<delete id="delChange" parameterClass="Integer">
+	  DELETE FROM FOURM_T_EQUIPCHANGE WHERE  CHANGE_ID =#changeId#
+	</delete>
+	
+	<delete id="delCEquip" parameterClass="Integer">
+	  DELETE FROM FOURM_T_CEQUIP WHERE CEQUIP_ID =#cequipId#
+	</delete>
+	
+	<!--子设备实时参数-->
+	<resultMap id="field" class="com.fourm.entity.Field">
+		<result property="fieldId" column="FIELD_ID" />
+		<result property="fieldType" column="FIELD_TYPE" />
+		<result property="fieldNo" column="FIELD_NO" />
+		<result property="fieldName" column="FIELD_NAME" />
+		<result property="fieldDesc" column="FIELD_DESC" />
+		<result property="fieldLimitLow" column="FIELD_LIMIT_LOW" />
+		<result property="fieldLimitHigh" column="FIELD_LIMIT_HIGH" />
+		<result property="fieldDisplayX" column="FIELD_DISPLAY_X" />
+		<result property="fieldDisplayY" column="FIELD_DISPLAY_Y" />
+		<result property="equipId" column="EQUIP_ID" />
+		<result property="groupId" column="GROUP_ID" />
+		<result property="groupName" column="GROUP_NAME" />
+	</resultMap>
+	<select id="getCequipField" parameterClass="java.util.HashMap" resultMap="field">
+    select FIELD_ID ,FIELD_TYPE , FIELD_NO , FIELD_NAME , FIELD_DESC , FIELD_LIMIT_LOW , FIELD_LIMIT_HIGH ,
+    		   FIELD_DISPLAY_X , FIELD_DISPLAY_Y , EQUIP_ID ,g.GROUP_ID ,GROUP_NAME
+    	from FOURM_T_FIELD f , FOURM_T_GROUP g
+    	where 
+    	  f.GROUP_ID = g.GROUP_ID
+    	 and FIELD_TYPE = 'L'
+    	 and
+	     EQUIP_ID=#equipId# 
+	     and
+	      CEQUIP_CODE=#cequipCode#;
+	
+	</select>
+	<!--子设备实时参数数据-->
+	<select id="getDisplayValue" parameterClass="java.util.HashMap" resultClass="String">
+    	select top 1 $COLUMN$  as VALUE
+   		  from $TABLE$
+   		 order by REAL_TIME DESC
+    </select>
+	
+	
+</sqlMap>

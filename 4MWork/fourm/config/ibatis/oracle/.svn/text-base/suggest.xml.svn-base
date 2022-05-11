@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 发布结果 -->    
+<sqlMap namespace="suggest">
+	<resultMap id="suggest" class="com.fourm.entity.Suggest">
+		<result property="suggId" column="SUGG_ID" />
+		<result property="suggCreateTime" column="SUGG_CREATE_TIME" />
+		<result property="suggTime" column="SUGG_TIME" />
+		<result property="suggObject" column="SUGG_OBJECT" />
+		<result property="suggContent" column="SUGG_CONTENT" />
+		<result property="equipId" column="EQUIP_ID" />
+	</resultMap>
+	<!-- 发布结果列表 -->
+	<select id="getSuggest" parameterClass="Map" resultMap="suggest">
+		select  RowNum,A.SUGG_ID , SUGG_OBJECT ,  SUGG_CREATE_TIME,  SUGG_TIME, SUGG_OBJECT ,SUGG_CONTENT , EQUIP_ID
+			  from 
+			  (select ROW_NUMBER() OVER (ORDER BY SUGG_TIME) AS RowNum , SUGG_ID , SUGG_CREATE_TIME, SUGG_TIME, SUGG_OBJECT ,SUGG_CONTENT , EQUIP_ID
+				from FOURM_T_SUGGEST
+				where EQUIP_ID = #equipId#
+				and SUGG_TIME >= #startTime#
+			  and SUGG_TIME &lt;= #endTime#
+				) A		  
+			   where RowNum > #pageCtrl.currLine#
+			   and RowNum &lt;= (#pageCtrl.currLine# + #pageCtrl.pageSize#)
+	</select>	 
+	<!-- 发布结果总记录数 -->
+	<select id="getSuggCount"  parameterClass="Map"  resultClass="int">
+		select count(1) from FOURM_T_SUGGEST
+			where EQUIP_ID = #equipId#
+				and SUGG_TIME >= #startTime#
+				and SUGG_TIME &lt;= #endTime#
+	</select>
+	<!-- 发布结果详情 -->
+	<select id="getSuggestById"  parameterClass="int"  resultMap="suggest">
+		select SUGG_ID ,  SUGG_CREATE_TIME,  SUGG_TIME, SUGG_OBJECT ,SUGG_CONTENT , EQUIP_ID
+			from FOURM_T_SUGGEST
+			where SUGG_ID = #detailId#
+	</select>
+</sqlMap>

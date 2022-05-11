@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- 用户信息-->
+<!-- 
+private int userId;
+	private String userName;
+	private String userPassword;
+	private String userIp;
+	private int roleId;
+	private int powerId;
+	private String privId;
+	private int roleLevel;
+	private int powerLevel;
+	private String roleName;
+	private String powerName;   
+-->
+
+<sqlMap namespace="user">
+	<resultMap id="user" class="com.fourm.entity.User">
+		<result property="userId" column="USER_ID" />
+		<result property="userName" column="USER_NAME" />
+		<result property="userPassword" column="USER_PASSWORD" />
+		<result property="userIp" column="USER_IP" />
+		<result property="privId" column="PRIV_ID" />
+		
+		<result property="roleId" column="ROLE_ID" />
+		<result property="powerId" column="POWER_ID" />
+		<result property="powerName" column="POWER_NAME" />
+		<result property="roleName" column="ROLE_NAME" />
+		
+		<result property="roleLevel" column="ROLE_LEVEL" />
+		<result property="powerLevel" column="POWER_LEVEL" />
+	</resultMap>
+	<!--用户登录，根据用户名称，查询用户信息	-->
+	<select id="getUser" parameterClass="com.fourm.entity.User" resultMap="user">
+		select u.USER_ID , u.USER_NAME , u.USER_PASSWORD , u.USER_IP , u.PRIV_ID ,
+				r.ROLE_ID , r.ROLE_NAME , r.ROLE_LEVEL , 
+				p.POWER_ID , p.POWER_NAME , p.POWER_LEVEL 
+		  from FOURM_T_USER u , FOURM_T_ROLE r , FOURM_T_POWER p
+		 where u.USER_NAME = #userName#	
+			 and u.POWER_ID = p.POWER_ID 
+			 and u.ROLE_ID = r.ROLE_ID  
+	</select>
+	 <resultMap id="equip" class="com.fourm.entity.Equip">
+		<result property="equipId" column="EQUIP_ID" />
+		<result property="equipCode" column="EQUIP_CODE" />
+		<result property="equipNum" column="EQUIP_NUM" />
+		<result property="equipName" column="EQUIP_NAME" />
+		<result property="displayPic" column="EQUIP_DISPLAY_PIC" />
+		<result property="model" column="EQUIP_MODEL" />
+		<result property="manual" column="EQUIP_MANUAL" />
+		<result property="designParam" column="EQUIP_DESIGN_PARAM" />
+		<result property="designSketch" column="EQUIP_DESIGN_SKETCH" />
+		<result property="manuInfo" column="EQUIP_MANU_INFO" />
+		<result property="startTime" column="EQUIP_START_TIME" />
+		<result property="provId" column="PROV_ID" />
+		<result property="provCode" column="PROV_CODE" />
+		<result property="provName" column="PROV_NAME" />
+		<result property="compId" column="COMP_ID" />
+		<result property="compCode" column="COMP_CODE" />
+		<result property="compName" column="COMP_NAME" />
+		<result property="mineId" column="MINE_ID" />
+		<result property="mineCode" column="MINE_CODE" />
+		<result property="mineName" column="MINE_NAME" />
+		<result property="roomId" column="ROOM_ID" />
+		<result property="rommCode" column="ROOM_CODE" />
+		<result property="roomName" column="ROOM_NAME" />
+		<result property="deviceId" column="DEVICE_ID" nullValue="0"/>
+	</resultMap>
+	<!-- 省级用户获取全部一个省的设备信息 -->
+	<select id="getPowerProv" parameterClass="String" resultMap="equip">
+		select e.EQUIP_ID , e.EQUIP_CODE, e.EQUIP_NUM , e.EQUIP_NAME, e.EQUIP_DISPLAY_PIC , e.EQUIP_MODEL,
+			e.EQUIP_MANUAL , e.EQUIP_DESIGN_PARAM , e.EQUIP_DESIGN_SKETCH , e.EQUIP_MANU_INFO , e.EQUIP_START_TIME , e.ROOM_ID,
+			r.ROOM_CODE , r.ROOM_NAME , r.MINE_ID , r.DEVICE_ID , m.MINE_CODE , m.MINE_NAME , m.COMP_ID ,c.COMP_CODE , c.COMP_NAME , c.PROV_ID ,
+			p.PROV_CODE , p.PROV_NAME 
+			from FOURM_T_PROVINCE  p, FOURM_T_COMPANY c, FOURM_T_MINE m , FOURM_T_ROOM r , FOURM_T_EQUIP e
+			where p.PROV_ID = c.PROV_ID
+			and c.COMP_ID = m.COMP_ID
+			 and m.MINE_ID = r.MINE_ID 
+			 and r.ROOM_ID = e.ROOM_ID
+			 and p.PROV_ID= #privId#
+	</select>
+	<!-- 集团用户获取一个集团的设备信息 -->
+	<select id="getPowerComp" parameterClass="String" resultMap="equip">
+		select e.EQUIP_ID , e.EQUIP_CODE, e.EQUIP_NUM , e.EQUIP_NAME, e.EQUIP_DISPLAY_PIC ,  e.EQUIP_MODEL,
+			e.EQUIP_MANUAL , e.EQUIP_DESIGN_PARAM , e.EQUIP_DESIGN_SKETCH , e.EQUIP_MANU_INFO ,CONVERT(char(10), e.EQUIP_START_TIME,120) as EQUIP_START_TIME , e.ROOM_ID,
+			r.ROOM_CODE , r.ROOM_NAME , r.MINE_ID , r.DEVICE_ID , m.MINE_CODE , m.MINE_NAME , m.COMP_ID ,c.COMP_CODE , c.COMP_NAME , c.PROV_ID ,
+			p.PROV_CODE , p.PROV_NAME 
+			from FOURM_T_PROVINCE  p, FOURM_T_COMPANY c, FOURM_T_MINE m , FOURM_T_ROOM r , FOURM_T_EQUIP e
+			where p.PROV_ID = c.PROV_ID
+			and c.COMP_ID = m.COMP_ID
+			 and m.MINE_ID = r.MINE_ID 
+			 and r.ROOM_ID = e.ROOM_ID
+			 and c.COMP_ID= #privId#
+	</select>
+	
+	<!-- 煤矿用户获取一个煤矿的设备信息 -->
+	<select id="getPowerMine" parameterClass="String" resultMap="equip">
+		select e.EQUIP_ID , e.EQUIP_CODE, e.EQUIP_NUM , e.EQUIP_NAME, e.EQUIP_DISPLAY_PIC ,  e.EQUIP_MODEL,
+			e.EQUIP_MANUAL , e.EQUIP_DESIGN_PARAM , e.EQUIP_DESIGN_SKETCH , e.EQUIP_MANU_INFO ,CONVERT(char(10), e.EQUIP_START_TIME,120) as EQUIP_START_TIME , e.ROOM_ID,
+			r.ROOM_CODE , r.ROOM_NAME , r.MINE_ID , r.DEVICE_ID , m.MINE_CODE , m.MINE_NAME , m.COMP_ID ,c.COMP_CODE , c.COMP_NAME , c.PROV_ID ,
+			p.PROV_CODE , p.PROV_NAME 
+			from FOURM_T_PROVINCE  p, FOURM_T_COMPANY c, FOURM_T_MINE m , FOURM_T_ROOM r , FOURM_T_EQUIP e
+			where p.PROV_ID = c.PROV_ID
+			and c.COMP_ID = m.COMP_ID
+			 and m.MINE_ID = r.MINE_ID 
+			 and r.ROOM_ID = e.ROOM_ID
+			 and m.MINE_ID= #privId#
+	</select>
+	
+	<!-- 机房用户获取一个机房的设备信息 -->
+	<select id="getPowerRoom" parameterClass="String" resultMap="equip">
+		select e.EQUIP_ID , e.EQUIP_CODE, e.EQUIP_NUM , e.EQUIP_NAME, e.EQUIP_DISPLAY_PIC , e.EQUIP_MODEL,
+			e.EQUIP_MANUAL , e.EQUIP_DESIGN_PARAM , e.EQUIP_DESIGN_SKETCH , e.EQUIP_MANU_INFO ,CONVERT(char(10), e.EQUIP_START_TIME,120) as EQUIP_START_TIME , e.ROOM_ID,
+			r.ROOM_CODE , r.ROOM_NAME , r.MINE_ID , r.DEVICE_ID , m.MINE_CODE , m.MINE_NAME , m.COMP_ID ,c.COMP_CODE , c.COMP_NAME , c.PROV_ID ,
+			p.PROV_CODE , p.PROV_NAME 
+			from FOURM_T_PROVINCE  p, FOURM_T_COMPANY c, FOURM_T_MINE m , FOURM_T_ROOM r , FOURM_T_EQUIP e
+			where p.PROV_ID = c.PROV_ID
+			and c.COMP_ID = m.COMP_ID
+			 and m.MINE_ID = r.MINE_ID 
+			 and r.ROOM_ID = e.ROOM_ID
+			 and r.ROOM_ID= #privId#
+	</select>
+</sqlMap>

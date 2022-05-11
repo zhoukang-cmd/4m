@@ -1,0 +1,15 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 视频 -->
+	<package name="camera" extends="fourm-default" namespace="/camera">
+        <action name="camera_*" class="com.fourm.action.camera.CameraAction" method="{1}">	
+        	<result name="camera_select">/front/camera.jsp</result> 
+        	<result name="camera_video">/front/camera.jsp</result>
+        	<result name="playback_select">/front/history_camera.jsp</result>
+        	<result name="playback_video">/front/history_camera.jsp</result>      
+	    </action>
+	</package>
+	
+</struts>

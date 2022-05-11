@@ -1,0 +1,107 @@
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib
+END
+sqljdbc4.jar
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/sqljdbc4.jar
+END
+commons-io.jar
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/commons-io.jar
+END
+commons-dbcp.jar
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/commons-dbcp.jar
+END
+commons-pool.jar
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/commons-pool.jar
+END
+jcl104-over-slf4j-1.5.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/jcl104-over-slf4j-1.5.0.jar
+END
+j2ee.jar
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/j2ee.jar
+END
+ojdbc14.jar
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/ojdbc14.jar
+END
+commons-collections.jar
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/commons-collections.jar
+END
+slf4j-api-1.5.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/slf4j-api-1.5.0.jar
+END
+ibatis-2.3.4.726.jar
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/ibatis-2.3.4.726.jar
+END
+commons-lang.jar
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/commons-lang.jar
+END
+logback-classic-0.9.8.jar
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/logback-classic-0.9.8.jar
+END
+quartz-all-1.6.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/quartz-all-1.6.1.jar
+END
+commons-net-3.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/commons-net-3.1.jar
+END
+commons-logging.jar
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/commons-logging.jar
+END
+spring.jar
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/spring.jar
+END
+logback-core-0.9.8.jar
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/projects/!svn/ver/1329/fourm_server/trunk/lib/logback-core-0.9.8.jar
+END

@@ -1,0 +1,53 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<constant name="struts.action.extension" value="html" />
+    <constant name="struts.enable.DynamicMethodInvocation" value="true" />
+    
+    <include file="struts-default.xml" />
+    
+    <include file="struts/user.xml" />
+    <include file="struts/common.xml" />
+    
+    <include file="struts/analyse.xml" />
+    <include file="struts/display.xml" />
+    <include file="struts/camera.xml" />
+    
+    <include file="struts/history.xml" />
+    
+    <include file="struts/compare.xml" />
+    
+    <include file="struts/fault.xml" />
+    <include file="struts/repair.xml" />
+    <include file="struts/suggest.xml" />
+    
+    <include file="struts/equip.xml" />
+    
+    
+	<constant name="struts.multipart.maxSize" value="10000000" />
+   <package name="fourm-default" extends="struts-default" namespace="/">
+	    <!-- 拦截器 -->
+	    <interceptors>
+			<interceptor name="myInterceptor" class="com.fourm.interceptor.LoginInterceptor" />	           
+            
+            <interceptor-stack name="loginInterceptor">
+            	<interceptor-ref name="defaultStack" />
+			    <interceptor-ref name="myInterceptor"/>    			    
+            </interceptor-stack>    
+              		
+		 </interceptors>
+		 <default-interceptor-ref name="loginInterceptor" />
+		 <!-- 全局result -->
+		<global-results>
+			<result name="loginPage">/index.jsp</result>
+			<result name="json">/front/common/json.jsp</result>
+			<result name="goDisplay">/front/error.jsp</result> 
+		</global-results>
+		 <global-exception-mappings>
+		   <exception-mapping result="goDisplay" exception="java.lang.Exception">
+		   </exception-mapping>
+		 </global-exception-mappings>
+				
+	</package>
+</struts>

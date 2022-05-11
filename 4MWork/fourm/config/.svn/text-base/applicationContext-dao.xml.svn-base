@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="userDao" class="com.fourm.dao.user.UserDao"  parent="fourmSqlMapClientTemplate" autowire="byName"/>
+	<bean id="suggestDao" class="com.fourm.dao.suggest.SuggestDao"  parent="fourmSqlMapClientTemplate" autowire="byName"/>
+	<bean id="faultDao" class="com.fourm.dao.fault.FaultDao"  parent="fourmSqlMapClientTemplate" autowire="byName"/>
+	<bean id="repairDao" class="com.fourm.dao.repair.RepairDao"  parent="fourmSqlMapClientTemplate" autowire="byName"/>
+	<bean id="historydataDao" class="com.fourm.dao.history.HistoryDataDao"  parent="fourmSqlMapClientTemplate" autowire="byName"/>
+	<bean id="displayDao" class="com.fourm.dao.display.DisplayDao"  parent="fourmSqlMapClientTemplate" autowire="byName"/>
+	<bean id="cameraDao" class="com.fourm.dao.camera.CameraDao"  parent="cameraSqlMapClientTemplate" autowire="byName"/>
+	<bean id="equipDao" class="com.fourm.dao.equip.EquipDao"  parent="fourmSqlMapClientTemplate" autowire="byName"/>
+</beans>
+
+
+

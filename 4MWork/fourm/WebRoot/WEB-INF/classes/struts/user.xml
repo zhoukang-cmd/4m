@@ -1,0 +1,26 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 用户登录 -->
+	<package name="user" extends="fourm-default" namespace="/user">
+	<!-- Action配置 一个Action可以被多次映射(只要action配置中的name不同)
+             name：action名称
+             class: 对应的类的路径
+             method: 调用Action中的方法名
+             此时method={1}中的{1}代表user_*中的*,即加入你访问路径是/user_login.action，
+             则此刻访问的是该Action中的login方法。同理，如果通配符* == delete,
+             则就访问的是delete方法。当name中含有多个通配符的时候，
+             method={2} ,就代表第二个通配符，同理以此类推。
+             这种方式更灵活的简化了struts.xml的配置文件。
+        -->
+        <action name="user_*" class="com.fourm.action.user.UserAction" method="{1}">	
+            <!-- 引用拦截器
+                name:拦截器名称或拦截器栈名称
+             -->
+        	<interceptor-ref name="defaultStack"></interceptor-ref>
+        	<result name="input">/index.jsp</result>
+        	<result name="front">/front/display.jsp</result>       
+	    </action>
+	</package>
+</struts>

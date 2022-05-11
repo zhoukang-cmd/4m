@@ -1,0 +1,25 @@
+package com.fourm.interceptor;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.xwork.StringUtils;
+import org.apache.struts2.ServletActionContext;
+
+import com.fourm.entity.User;
+import com.opensymphony.xwork2.ActionInvocation;
+import com.opensymphony.xwork2.interceptor.AbstractInterceptor;
+/**
+ * 拦截器
+ * */
+public class LoginInterceptor extends AbstractInterceptor{
+	
+	public String intercept(ActionInvocation invocation) throws Exception {
+		HttpServletRequest request = ServletActionContext.getRequest();
+		User user = (User) request.getSession().getAttribute("account");
+		if (user!=null && (!StringUtils.isBlank(user.getUserName()))&& (!StringUtils.isBlank(user.getUserPassword()))) {
+			return invocation.invoke(); 
+		} else {
+			return "loginPage";
+		}
+	}
+}

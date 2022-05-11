@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+  - Application context for the remote OrderService client.
+	- Defines various OrderService proxies to be called by OrderServiceClient.
+	-->
+<beans>
+	<bean id="placeholderConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>conf/sysconfig.properties</value>
+		</property>
+	</bean>
+	 
+	<!-- Spring iBatis Template -->
+    <bean name="sqlMap" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+			<value>classpath:/config/SqlMapConfig.xml</value>
+		</property>
+	</bean>
+    <bean id="sqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+    	<property name="dataSource" ref="dataSource"/>
+    	<property name="sqlMapClient"><ref bean="sqlMap" /></property>
+  	</bean>
+  	
+  	<!-- 数据源和事务 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName">
+            <value>${ibsdbDataSource.driverClassName}</value>
+        </property>
+        <property name="url">
+            <value>${ibsdbDataSource.url}</value>
+        </property>
+        <property name="username">
+            <value>${ibsdbDataSource.username}</value>
+        </property>
+        <property name="password">
+            <value>${ibsdbDataSource.password}</value>
+        </property>
+    </bean>
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+    	<property name="dataSource">
+    		<ref bean="dataSource" />
+    	</property>
+    </bean>
+    <bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+    	<property name="transactionManager" ref="transactionManager"></property>
+		<property name="propagationBehaviorName"><value>PROPAGATION_REQUIRED</value></property>
+		<property name="isolationLevelName"><value>ISOLATION_DEFAULT</value></property>
+		<property name="readOnly"><value>false</value></property>
+		<property name="timeout"><value>35</value></property>
+    </bean>
+    
+  	<!-- 要调用的工作类 --> 
+	<bean id="tcpServer" class="com.fourm.common.TcpServer" init-method="start">
+		<property name="port"><value>${tcpserver.port}</value></property>
+		<property name="localPath"><value>${tcpserver.dataPath}</value></property>
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean> 
+	<bean id="addParams" class="com.fourm.server.ui.AddParams" lazy-init="true">
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+	</bean> 
+	
+	<!-- 定时处理文件任务 --> 
+	<bean id="processTask" class="com.fourm.server.task.ProcessFileTask">
+		<property name="dataPath"><value>${tcpserver.dataPath}</value></property>
+		<property name="histPath"><value>${tcpserver.histPath}</value></property>
+		<property name="lvmPath"><value>${tcpserver.lvmPath}</value></property>
+		<property name="sqlMapClient" ref="sqlMapClient"></property>
+		<property name="transactionTemplate" ref="transactionTemplate"></property>
+	</bean>
+    <bean id="jobtask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"> 
+        <property name="targetObject"> 
+            <ref bean="processTask"/> 
+        </property> 
+        <property name="targetMethod"> 
+            <value>process</value> 
+        </property> 
+        <property name="concurrent"> 
+            <value>false</value> 
+        </property> 
+    </bean> 
+    <bean id="doTime" class="org.springframework.scheduling.quartz.CronTriggerBean"> 
+        <property name="jobDetail"> 
+            <ref bean="jobtask"/> 
+        </property> 
+        <!-- cron表达式 --> 
+        <property name="cronExpression"> 
+            <value>${server.cron}</value> 
+        </property> 
+    </bean> 
+    
+    <!-- 定时删文件任务 -->
+    <bean id="deleteFileTask" class="com.fourm.server.task.FileDeleteTask">
+		<property name="dataPath"><value>${tcpserver.dataPath}</value></property>
+		<property name="histPath"><value>${tcpserver.histPath}</value></property>
+		<property name="dayBeforeDelete"><value>${server.deleteOld}</value></property>
+	</bean>
+    <bean id="jobDeleteFile" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"> 
+        <property name="targetObject"> 
+            <ref bean="deleteFileTask"/> 
+        </property> 
+        <property name="targetMethod"> 
+            <value>process</value> 
+        </property> 
+        <property name="concurrent"> 
+            <value>false</value> 
+        </property> 
+    </bean> 
+    <bean id="doTimeDeleteFile" class="org.springframework.scheduling.quartz.CronTriggerBean"> 
+        <property name="jobDetail"> 
+            <ref bean="jobDeleteFile"/> 
+        </property> 
+        <!-- cron表达式 --> 
+        <property name="cronExpression"> 
+            <value>0 0 0 * * ? *</value> 
+        </property> 
+    </bean> 
+    
+    <!-- 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序  --> 
+    <bean id="startQuertz" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"> 
+        <property name="triggers"> 
+            <list> 
+            	<ref bean="doTime"/>
+            	<ref bean="doTimeDeleteFile"/>
+            </list> 
+        </property> 
+    </bean>
+
+</beans>
+

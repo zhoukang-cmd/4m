@@ -1,0 +1,15 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 前台     历史故障 -->
+	<package name="fault" extends="fourm-default" namespace="/fault">
+        <action name="fault_*" class="com.fourm.action.fault.FaultAction" method="{1}">	
+        	<result name="goFault">/front/fault.jsp</result>    
+        	<result name="goPainter">/front/fault_painter.jsp</result>    
+        	<result name="goFaultDetail">/front/fault_detail.jsp</result>   
+        	<result name="goAddFault">/front/fault_add.jsp</result>	
+        	<result name="goModifyFault">/front/fault_modify.jsp</result>	
+        </action>
+	</package>
+</struts>

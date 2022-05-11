@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:jdbc.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="fourm_pool" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${fourm.driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value><![CDATA[${fourm.url}]]></value>
+		</property>
+		<property name="user">
+			<value>${fourm.username}</value>
+		</property>
+		<property name="password">
+			<value>${fourm.password}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>3600</value>
+		</property>
+		<property name="preferredTestQuery">
+			<value>SELECT 1</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>1800</value>
+		</property>
+		<!--<property name="testConnectionOnCheckout">
+			<value>true</value>
+		</property>
+	--></bean>
+	
+	
+	<bean id="camera_pool" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${video.driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value><![CDATA[${video.url}]]></value>
+		</property>
+		<property name="user">
+			<value>${video.username}</value>
+		</property>
+		<property name="password">
+			<value>${video.password}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>3600</value>
+		</property>
+		<property name="preferredTestQuery">
+			<value>SELECT 1</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>1800</value>
+		</property>
+		<property name="testConnectionOnCheckout">
+			<value>true</value>
+		</property>
+	</bean>
+	
+	<bean id="playback_pool" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass">
+			<value>${video.driverClassName}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value><![CDATA[${video.url}]]></value>
+		</property>
+		<property name="user">
+			<value>${video.username}</value>
+		</property>
+		<property name="password">
+			<value>${video.password}</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>3600</value>
+		</property>
+		<property name="preferredTestQuery">
+			<value>SELECT 1</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>1800</value>
+		</property>
+		<property name="testConnectionOnCheckout">
+			<value>true</value>
+		</property>
+	</bean>
+	
+	<bean id="transactionProxy"
+		class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean"
+		abstract="true">
+		<property name="transactionManager">
+			<ref bean="transactionManager" />
+		</property>
+		<property name="transactionAttributes">
+			<props>
+				<prop key="*">PROPAGATION_REQUIRED</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="fourmTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="fourm_pool" />
+	</bean>
+	
+	<bean id="cameraTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="camera_pool" />
+	</bean>
+	
+	<bean id="playbackTransactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="playback_pool" />
+	</bean>
+	
+
+	<bean id="fourmSqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+			<value>classpath:sqlMapConfig_fourm.xml</value>
+		</property>
+		<property name="dataSource" ref="fourm_pool" />
+	</bean>
+	
+	<bean id="cameraSqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+			<value>classpath:sqlMapConfig_video.xml</value>
+		</property>
+		<property name="dataSource" ref="camera_pool" />
+	</bean>
+	
+	<bean id="playbackSqlMapClient" class="org.springframework.orm.ibatis.SqlMapClientFactoryBean">
+		<property name="configLocation">
+			<value>classpath:sqlMapConfig_video.xml</value>
+		</property>
+		<property name="dataSource" ref="playback_pool" />
+	</bean>
+
+	<bean id="fourmSqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient" ref="fourmSqlMapClient" />
+	</bean>
+	
+	<bean id="cameraSqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient" ref="cameraSqlMapClient" />
+	</bean>
+	
+	<bean id="playbackSqlMapClientTemplate" class="org.springframework.orm.ibatis.SqlMapClientTemplate">
+		<property name="sqlMapClient" ref="playbackSqlMapClient" />
+	</bean>
+
+	<import resource="classpath:applicationContext-dao.xml" />
+	<import resource="classpath:applicationContext-service.xml" />
+</beans>

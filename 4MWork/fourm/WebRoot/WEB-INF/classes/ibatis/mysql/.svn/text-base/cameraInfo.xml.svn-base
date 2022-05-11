@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap      
+    PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"      
+    "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+    
+<sqlMap namespace="cameraInfo">	
+	<resultMap id="rcameraInfo" class="com.fourm.entity.CameraInfo">
+	    <result property="cameraId" column="camera_id" />
+		<result property="cameraName" column="name" />
+		<result property="regionId"  column="region_id" jdbcType="int" nullValue="0" />
+		<result property="channelNum"  column="chan_num" jdbcType="int" nullValue="0"/>
+		<result property="controlUnitId"  column="control_unit_id" jdbcType="int" nullValue="0" />
+		<result property="deviceIp" column="network_addr" />
+		<result property="devicePort" column="network_port" jdbcType="int" nullValue="0" />		
+		<result property="deviceCode" column="index_code" />
+		<result property="deviceName" column="user_name" />
+		<result property="devicePassword"  column="user_pwd" />
+	</resultMap>	
+	
+	<select id="getCameraInfoList"  parameterClass="java.lang.Integer" resultMap="rcameraInfo">
+		select c.camera_id, c.name, c.region_id, c.chan_num, d.control_unit_id, d.network_addr, d.network_port, d.index_code, d.user_name, d.user_pwd 
+		from camera_info c 
+		left join device_info d 
+		on c.device_id = d.device_id 
+		where d.device_id =#deviceId#
+	</select>
+	
+	<select id="getSingleCameraInfoList" parameterClass="Integer" resultMap="rcameraInfo">
+	 	select c.camera_id, c.name, c.region_id, d.control_unit_id, c.channel_no, 
+		d.network_addr, d.network_port,d.index_code, d.user_name, d.user_pwd 
+		from camera_info c 
+		left join device_info d 
+		on c.device_id = d.device_id
+		where c.camera_id = #value#
+	
+		
+	</select>	
+	
+</sqlMap>

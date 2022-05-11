@@ -1,0 +1,14 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 历史维护 -->
+	<package name="repair" extends="fourm-default" namespace="/repair">
+        <action name="repair_*" class="com.fourm.action.repair.RepairAction" method="{1}">	
+        	<result name="goRepair">/front/repair.jsp</result>    
+        	<result name="goRepairDetail">/front/repair_detail.jsp</result>   
+        	<result name="goAddRepair">/front/repair_add.jsp</result>	
+        	<result name="goModifyRepair">/front/repair_modify.jsp</result>	
+        </action>
+	</package>
+</struts>

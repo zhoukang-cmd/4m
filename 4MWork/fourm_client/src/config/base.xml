@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN 2.0//EN" "http://www.springframework.org/dtd/spring-beans-2.0.dtd">
+
+<!--
+  - Application context for the remote OrderService client.
+	- Defines various OrderService proxies to be called by OrderServiceClient.
+	-->
+<beans>
+	<bean id="placeholderConfig"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location">
+			<value>conf/sysconfig.properties</value>
+		</property>
+	</bean>
+	
+	<!-- FTP客户端 -->
+	<bean id="ftpClient" class="com.fourm.common.FourmFtpClient">
+		<property name="serverUrl"><value>${ftp.serverUrl}</value></property>
+		<property name="userName"><value>${ftp.username}</value></property>
+		<property name="password"><value>${ftp.password}</value></property>
+		<property name="serverPort"><value>${ftp.serverPort}</value></property>
+	</bean>
+	
+	<!-- TCP客户端 -->
+	<bean id="tcpClient" class="com.fourm.common.TcpClient">
+		<property name="host"><value>${tcpserver.host}</value></property>
+		<property name="port"><value>${tcpserver.port}</value></property>
+	</bean>
+	
+	<!-- 定时处理文件任务 --> 
+	<bean id="processTask" class="com.fourm.client.task.ProcessFileTask">
+		<property name="sourcePath"><value>${client.sourcePath}</value></property>
+		<property name="histPath"><value>${client.histPath}</value></property>
+		<property name="zipPath"><value>${client.zipPath}</value></property>
+		<property name="successPath"><value>${client.successPath}</value></property>
+		<property name="failPath"><value>${client.failPath}</value></property>
+		<property name="serverPath"><value>${client.serverPath}</value></property>		
+		<property name="ftpClient" ref="ftpClient"></property>
+		<property name="tcpClient" ref="tcpClient"></property>		
+		<property name="suffix"><value>${client.suffix}</value></property>	
+	</bean>
+    <bean id="jobtask" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"> 
+        <property name="targetObject"><ref bean="processTask"/></property> 
+        <property name="targetMethod"><value>process</value></property> 
+        <property name="concurrent"><value>false</value></property> 
+    </bean> 
+    <bean id="doTime" class="org.springframework.scheduling.quartz.CronTriggerBean"> 
+        <property name="jobDetail"><ref bean="jobtask"/></property> 
+        <property name="cronExpression"><value>${client.cron}</value></property> 
+    </bean>
+    
+    <!-- 定时删文件任务 -->
+    <bean id="deleteFileTask" class="com.fourm.client.task.FileDeleteTask">
+		<property name="sourcePath"><value>${client.sourcePath}</value></property>
+		<property name="histPath"><value>${client.histPath}</value></property>
+		<property name="zipPath"><value>${client.zipPath}</value></property>
+		<property name="failPath"><value>${client.failPath}</value></property>
+		<property name="successPath"><value>${client.successPath}</value></property>
+		<property name="dayBeforeDelete"><value>${client.deleteOld}</value></property>
+	</bean>
+    <bean id="jobDeleteFile" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"> 
+        <property name="targetObject"><ref bean="deleteFileTask"/></property> 
+        <property name="targetMethod"><value>process</value></property> 
+        <property name="concurrent"><value>false</value></property> 
+    </bean> 
+    <bean id="doTimeDeleteFile" class="org.springframework.scheduling.quartz.CronTriggerBean"> 
+        <property name="jobDetail"><ref bean="jobDeleteFile"/></property> 
+        <property name="cronExpression"><value>0 0 0 * * ? *</value></property> 
+    </bean> 
+    
+    <!-- 定时发送日志任务 -->
+    <bean id="SendLogTask" class="com.fourm.client.task.SendLogTask">
+		<property name="clientid"><value>${client.id}</value></property>
+		<property name="serverPath"><value>${client.serverPath}</value></property>		
+		<property name="ftpClient" ref="ftpClient"></property>
+	</bean>
+    <bean id="jobSendLog" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean"> 
+        <property name="targetObject"><ref bean="SendLogTask"/></property> 
+        <property name="targetMethod"><value>process</value></property> 
+        <property name="concurrent"><value>false</value></property>
+    </bean>
+    <bean id="doTimeSendLog" class="org.springframework.scheduling.quartz.CronTriggerBean"> 
+        <property name="jobDetail"><ref bean="jobSendLog"/></property>
+        <property name="cronExpression"><value>0 10 0 * * ? *</value></property> 
+    </bean>
+    
+    <!-- 总管理类 如果将lazy-init='false'那么容器启动就会执行调度程序  --> 
+    <bean id="startQuertz" class="org.springframework.scheduling.quartz.SchedulerFactoryBean"> 
+        <property name="triggers"> 
+            <list>
+                <ref bean="doTime"/>
+                <ref bean="doTimeDeleteFile"/>
+                <!-- <ref bean="doTimeSendLog"/> (暂不启用定时发日志功能)-->
+            </list> 
+        </property> 
+    </bean> 
+</beans>
+

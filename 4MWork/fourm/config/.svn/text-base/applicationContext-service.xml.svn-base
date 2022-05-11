@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+	<bean id="userService" class="com.fourm.service.user.UserService" autowire="byName">
+		<property name="userDao" ref="userDao" /> 
+	</bean>
+	<bean id="suggestService" class="com.fourm.service.suggest.SuggestService" autowire="byName">
+		<property name="suggestDao" ref="suggestDao" /> 
+	</bean>
+	<bean id="faultService" class="com.fourm.service.fault.FaultService" autowire="byName">
+		<property name="faultDao" ref="faultDao" /> 
+	</bean>
+	<bean id="repairService" class="com.fourm.service.repair.RepairService" autowire="byName">
+		<property name="repairDao" ref="repairDao" /> 
+	</bean>
+	<bean id="historydataService" class="com.fourm.service.history.HistoryDataService" autowire="byName">
+		<property name="historydataDao" ref="historydataDao" /> 
+	</bean>
+	<bean id="displayService" class="com.fourm.service.display.DisplayService" autowire="byName">
+		<property name="displayDao" ref="displayDao" /> 
+	</bean>
+	<bean id="cameraService" class="com.fourm.service.camera.CameraService" autowire="byName">
+		<property name="cameraDao" ref="cameraDao" /> 
+	</bean>
+	<bean id="equipService" class="com.fourm.service.equip.EquipService" autowire="byName">
+		<property name="equipDao" ref="equipDao" /> 
+	</bean>
+</beans>

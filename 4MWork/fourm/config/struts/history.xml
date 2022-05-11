@@ -1,0 +1,18 @@
+<!DOCTYPE struts PUBLIC
+        "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+        "http://struts.apache.org/dtds/struts-2.0.dtd">
+<struts>
+	<!-- 历史数据 -->
+	<package name="history" extends="fourm-default" namespace="/history">
+        <!-- 历史参数 -->
+        <action name="historyData_*" class="com.fourm.action.history.HistoryDataAction" method="{1}">	
+        	<result name="goHistoryData">/front/history_data.jsp</result>       
+	    </action>
+	    <!-- 历史报表 -->
+	    <action name="report_*" class="com.fourm.action.report.ReportAction" method="{1}">	
+        	<result name="goReport">/front/report.jsp</result> 
+        	<result name="reportSelect">/front/report_select.jsp</result>
+        	      
+	    </action>
+	</package>
+</struts>

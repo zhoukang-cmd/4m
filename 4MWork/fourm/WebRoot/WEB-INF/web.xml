@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+  
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                      http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+  version="4.0"
+  metadata-complete="true">
+  
+  <!--定义spring的配置文件位置  -->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>
+			classpath:applicationContext.xml
+		</param-value>
+  </context-param>
+  
+  
+  <!-- 如果不设，默认为web.root,但最好设置，以免项目间冲突 -->
+  <context-param>
+    <param-name>webAppRootKey</param-name>
+    <param-value>fourm.root</param-value>
+  </context-param>
+  <context-param>
+  	<param-name>log4jConfigLocation</param-name>
+    <param-value>/WEB-INF/classes/log4j.properties</param-value>
+  </context-param>
+
+  <listener>
+    <listener-class>org.springframework.web.util.Log4jConfigListener</listener-class>
+  </listener>
+  
+  
+  <!-- 启动Spring -->
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  
+  
+   <!-- *************************************************** -->
+  <!-- 就是说，一般情况下，如果你要用SiteMesh或者其他过滤器，一般是放在FilterDispatcher或者是现在的StrutsPrepareAndExecuteFilter之前。
+  在调用完所有过滤器的doFilter方法后，核心过滤器FilterDispatcher或者StrutsPrepareAndExecuteFilter会清空ActionContext，
+  如果其他过滤器要一直使用value stack等struts的特性时，如果不用ActionContextCleanUp的话，便得不到想要的值。 ActionContextCleanUp的
+  作用就是上面用粗体标注出来的那一句。它会在doFilter方法里设置一个计数器counter的初始值为1，有了这个值，
+  后续的核心过滤器就不会清空ActionContext，而是由之前的过滤器也就是ActionContextCleanUp来清空ActionContext。
+  从struts2.1.3开始这个功能集成到了下面的fliter
+  <filter>
+    <filter-name>struts2</filter-name>
+    <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+  </filter>
+   -->
+  <filter>
+    <filter-name>struts-cleanup</filter-name>
+    <filter-class>org.apache.struts2.dispatcher.ActionContextCleanUp</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>struts-cleanup</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+   <!-- *************************************************** -->
+   
+   
+   <!--
+   CharEncodingFilter是spring内置过滤器的一种，用来指定请求或者响应的编码格式
+   浏览器每次发送请求都会经过这个过滤器,其中encoding用来指定编码格式，
+   forceEncoding表示是否强制response的编码格式也是encoding格式
+   -->
+  <filter>
+    <filter-name>CharEncodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  
+  <filter-mapping>
+    <filter-name>CharEncodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  
+  
+  <!-- *************************************************** -->
+  
+  <!-- 所有请求连接中末尾是 .html和.jsp的请求都有struts2来处理 -->
+  <filter>
+    <filter-name>struts2</filter-name>
+    <filter-class>org.apache.struts2.dispatcher.ng.filter.StrutsPrepareAndExecuteFilter</filter-class>
+  </filter>
+  <!-- 这里给人的感觉是跳转静态页面，实际不是，而是由struts来处理 -->
+  <filter-mapping>
+    <filter-name>struts2</filter-name>
+    <url-pattern>*.html</url-pattern>
+  </filter-mapping>
+  
+  <filter-mapping>
+    <filter-name>struts2</filter-name>
+    <url-pattern>*.jsp</url-pattern>
+  </filter-mapping>
+  <!-- *************************************************** -->
+</web-app>
